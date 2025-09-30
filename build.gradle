@@ -1,6 +1,8 @@
 plugins {
     id 'java'
+    id 'application'
 }
+
 group = 'nl.bioinf'
 version = '1.0-SNAPSHOT'
 
@@ -14,6 +16,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'info.picocli:picocli:4.7.7'
     annotationProcessor 'info.picocli:picocli-codegen:4.7.7'
+}
+
+application {
+    mainClass = 'nl.bioinf.Main'
 }
 
 // voor picocli annotationProcessor
