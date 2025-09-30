@@ -18,21 +18,24 @@ import java.util.concurrent.Callable;
 public class ArgumentParser implements Callable<Integer> {
 //    vangt input file op
     @Option(names = { "-f", "--file" },
-            paramLabel = "inputFile",
-            description = "the input file",
-            required = true)
+            paramLabel = "inputFile", // zo heet hij in help
+            description = "the input file", // ook in help
+            required = false)
     File inputFile;
 
+    // geeft paden terug van files
     @Override
     public Integer call() {
         System.out.println("File: " + inputFile.getAbsolutePath());
         return 0; // return 0 als het goed gaat
     }
-
+    
+// maakt commandline object van de class argumentparser
     public static void main(String[] args) {
         int exitCode = new picocli.CommandLine(new ArgumentParser()).execute(args);
-        System.exit(exitCode);
+        System.exit(exitCode); // geef mee aan het systeem of het goed gaat (0 of 1)
     }
 }
 
 
+// runnen: ./gradlew run --args="--file data/raw/interactions.tsv"
