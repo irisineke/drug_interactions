@@ -41,5 +41,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-# data
-/data
+/data/raw/drugs.tsv
+/data/raw/interactions.tsv
+/data/prepared/drugs.tsv
+/data/prepared/interactions.tsv
