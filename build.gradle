@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group = 'nl.bioinf'
@@ -13,8 +14,35 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'info.picocli:picocli:4.7.7'
+    annotationProcessor 'info.picocli:picocli-codegen:4.7.7'
+}
+
+application {
+    mainClass = 'nl.bioinf.Main'
+}
+
+// voor picocli annotationProcessor
+compileJava {
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
 
 test {
     useJUnitPlatform()
 }
+
+jar {
+    manifest {
+        attributes 'Main-Class': "nl.bioinf.Main"
+    }
+}
+
+// // ff kijken of idt werkt voor default input
+// tasks.register("runParser", JavaExec) {
+//     description = "Run the ArgumentParser with default input file"
+//
+//     mainClass.set("nl.bioinf.ArgumentParser")   // zegt welke class de main is :)
+//     classpath = sourceSets.main.get().runtimeClasspath // zorgt dat lle classes herkent worden
+//
+//     args = ["--file", "data/raw/interactions.tsv"]  // default argumenten
+// }
