@@ -62,7 +62,6 @@ public class LeesBestanden {
 
             String delimiter = "\t";
             String[] headers = headerLine.split("\t", -1);
-            ;
 
             // Eventuele BOM verwijderen
             if (headers.length > 0) {
