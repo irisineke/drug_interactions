@@ -31,18 +31,12 @@ test {
     useJUnitPlatform()
 }
 
+// om de jar te kunnen maken
 jar {
     manifest {
         attributes 'Main-Class': "nl.bioinf.Main"
     }
+//     from {
+//         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+//     }
 }
-
-// // ff kijken of idt werkt voor default input
-// tasks.register("runParser", JavaExec) {
-//     description = "Run the ArgumentParser with default input file"
-//
-//     mainClass.set("nl.bioinf.ArgumentParser")   // zegt welke class de main is :)
-//     classpath = sourceSets.main.get().runtimeClasspath // zorgt dat lle classes herkent worden
-//
-//     args = ["--file", "data/raw/interactions.tsv"]  // default argumenten
-// }

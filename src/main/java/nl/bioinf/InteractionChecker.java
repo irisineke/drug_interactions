@@ -1,8 +1,8 @@
 package nl.bioinf;
 
+// dummy class voor uml
 public class InteractionChecker {
-    public static void main(String[] args){
-        System.out.println("not implemented yet");
+    public void run() {
+        System.out.println("not implemented yet !");
     }
-}
 }
