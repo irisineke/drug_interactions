@@ -72,6 +72,8 @@ public class ArgumentParser implements Runnable {
         System.out.println("\nVoorbeeld (eerste 2 regels drugs.tsv):");
         LeesBestanden.printFirstNLines(preparedDrugs, 2);
     }
+    OutputGenerator generator = new OutputGenerator();
+    InteractionChecker checker = new InteractionChecker();
 
 //    public static void main(String[] args) {
 //        int exitCode = new CommandLine(new ArgumentParser()).execute(args);
