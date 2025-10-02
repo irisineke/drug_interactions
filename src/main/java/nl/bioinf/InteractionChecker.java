@@ -5,4 +5,4 @@ public class InteractionChecker {
         System.out.println("not implemented yet");
     }
 }
-}
+
