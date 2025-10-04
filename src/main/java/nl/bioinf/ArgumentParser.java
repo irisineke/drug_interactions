@@ -42,6 +42,13 @@ public class ArgumentParser implements Runnable {
     File secondDrugInput;
 
 
+    @Option(names = {"-output", "-o"},
+            paramLabel = "output",
+            description = "put the spath to where you want the output to land",
+            required = true)
+    File output;
+
+
     @Override
     public void run() {
 
@@ -120,18 +127,14 @@ public class ArgumentParser implements Runnable {
         LeesBestanden.printFirstNLines(preparedDrugs, 2);
     }
 
-//    tijdleijk voor uml
-    OutputGenerator generator = new OutputGenerator();
-    InteractionChecker checker = new InteractionChecker();
+//    tijdleijk voor uml, 3e en 4e paths gaan later weg als t goed is.
+    LeesBestanden leesBestanden = new LeesBestanden(interactionsFile, drugsFile);
+    InteractionChecker checker = new InteractionChecker(firstDrugInput, secondDrugInput);
+    OutputGenerator generator = new OutputGenerator(output);
 
 }
-// maakt commandline object van de class argumentparser
-//    public static void main(String[] args) {
-//        int exitCode = new picocli.CommandLine(new ArgumentParser()).execute(args);
-//        System.exit(exitCode); // geef mee aan het systeem of het goed gaat (0 of 1)
-//          System.exit(new CommandLine(new MyApp()).execute(args));
-//    }
 
 
 
-// runnen: ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 a -d2 b'
+
+// runnen: ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 a -d2 b -o /data'
