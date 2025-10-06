@@ -1,144 +1,79 @@
 package nl.bioinf;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 
 public class LeesBestanden {
-    private final Path rawInteractions;
-    private final Path rawDrugs;
-    private final Path preparedInteractions;
-    private final Path preparedDrugs;
+    private final File interactionsFile;
+    private final File drugsFile;
 
-    public LeesBestanden(Path rawInteractions, Path rawDrugs,
-                         Path preparedInteractions, Path preparedDrugs) {
-        this.rawInteractions = rawInteractions;
-        this.rawDrugs = rawDrugs;
-        this.preparedInteractions = preparedInteractions;
-        this.preparedDrugs = preparedDrugs;
+    //Haalt de paden binnen van de ArgumentParser
+    public LeesBestanden(File interactionsFile, File drugsFile) {
+        this.interactionsFile = interactionsFile;
+        this.drugsFile = drugsFile;
     }
 
-    /**
-     * Zorgt dat de prepared-bestanden bestaan:
-     * - Als prepared al bestaat → gebruik die.
-     * - Anders, als raw bestaat → maak nieuwe prepared-bestanden met alleen de gevraagde kolommen.
-     * - Anders → gooi een foutmelding.
-     */
-    public void ensurePreparedData(List<String> keepInteractions, List<String> keepDrugs) throws IOException {
-        boolean preparedExists = Files.exists(preparedInteractions) && Files.exists(preparedDrugs);
-        if (preparedExists) return;
+    public Map<String, List<String>> process() {
+        //filterd op benodigde collomen
+        List<String> interactions = filterFile(interactionsFile, List.of(
+                "gene_claim_name",
+                "interaction_type",
+                "interaction_score",
+                "drug_concept_id"
+        ));
 
-        boolean rawExists = Files.exists(rawInteractions) && Files.exists(rawDrugs);
-        if (rawExists) {
-            Files.createDirectories(preparedInteractions.getParent());
-            filterTsvKeepColumnsByHeader(rawInteractions, preparedInteractions, keepInteractions);
-            filterTsvKeepColumnsByHeader(rawDrugs, preparedDrugs, keepDrugs);
+        List<String> drugs = filterFile(drugsFile, List.of(
+                "drug_claim_name",
+                "concept_id"
+        ));
 
-            if (!(Files.exists(preparedInteractions) && Files.exists(preparedDrugs))) {
-                throw new IllegalStateException("Aanmaken van prepared-bestanden is mislukt.");
-            }
-            return;
-        }
-
-        throw new IllegalStateException(
-                "Data ontbreekt: niet gevonden\n" +
-                        "prepared: " + preparedInteractions + " & " + preparedDrugs + "\n" +
-                        "raw: " + rawInteractions + " & " + rawDrugs
-        );
+        // Maakt een nieuwe Map aan in het geheugen om de resultaten op te slaan
+        Map<String, List<String>> result = new HashMap<>();
+        // Slaat de interactiegegevens op onder de sleutel "interactions"
+        result.put("interactions", interactions);
+        // Slaat de geneesmiddelgegevens op onder de sleutel "drugs"
+        result.put("drugs", drugs);
+        // Geeft de samengestelde Map terug
+        return result;
     }
 
-    /**
-     * Leest een TSV (met header) en schrijft een nieuw bestand met alleen de gewenste kolommen.
-     */
-    private void filterTsvKeepColumnsByHeader(Path input, Path output, List<String> headersToKeep) throws IOException {
-        if (!Files.exists(input)) {
-            throw new FileNotFoundException("Bestand ontbreekt: " + input.toAbsolutePath());
-        }
 
-        try (BufferedReader br = Files.newBufferedReader(input, StandardCharsets.UTF_8)) {
-            String headerLine = br.readLine();
-            if (headerLine == null) throw new IllegalStateException("Lege tabel: " + input);
+    // Filtert een bestand op opgegeven kolommen en leest alle rijen
+    private List<String> filterFile(File file, List<String> keepCols) {
+        try {
+            // Leest alle regels uit het bestand
+            List<String> lines = Files.readAllLines(file.toPath());
+            if (lines.isEmpty()) return Collections.emptyList();
 
-            String delimiter = "\t";
-            String[] headers = headerLine.split("\t", -1);
+            // Leest de headerregel (eerste regel) en splitst deze op tabs
+            String headerLine = lines.get(0);
+            String[] headers = headerLine.split("\t");
 
-            // Eventuele BOM verwijderen
-            if (headers.length > 0) {
-                headers[0] = headers[0].replace("\uFEFF", "").trim();
-            }
-
-            Map<String, Integer> indexByHeader = new HashMap<>();
+            // Bepaalt welke kolommen behouden moeten blijven
+            List<Integer> keepIndexes = new ArrayList<>();
             for (int i = 0; i < headers.length; i++) {
-                indexByHeader.put(headers[i].trim(), i);
+                if (keepCols.contains(headers[i])) keepIndexes.add(i);
             }
 
-            // Check op ontbrekende kolommen
-            List<String> missing = new ArrayList<>();
-            for (String h : headersToKeep) {
-                if (!indexByHeader.containsKey(h)) missing.add(h);
-            }
-            if (!missing.isEmpty()) {
-                throw new IllegalStateException(
-                        "Kolom(men) ontbreken in " + input + ": " + missing +
-                                "\nBeschikbare kolommen: " + indexByHeader.keySet()
-                );
+            // Maakt een nieuwe lijst om de gefilterde regels op te slaan
+            List<String> result = new ArrayList<>();
+            result.add(String.join("\t", keepCols)); // headerregel
+
+            // Loopt door alle dataregels in het bestand
+            for (int i = 1; i < lines.size(); i++) {
+                String[] parts = lines.get(i).split("\t", -1);
+                List<String> filtered = new ArrayList<>();
+                for (int idx : keepIndexes) filtered.add(parts[idx]);
+                result.add(String.join("\t", filtered));
             }
 
-            // Schrijf nieuwe TSV met alleen de gewenste kolommen
-            Files.createDirectories(output.getParent());
-            try (BufferedWriter bw = Files.newBufferedWriter(output, StandardCharsets.UTF_8,
-                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            // Geeft de gefilterde regels terug
+            return result;
 
-                bw.write(String.join(delimiter, headersToKeep));
-                bw.newLine();
-
-                String line;
-                while ((line = br.readLine()) != null) {
-                    String[] cells = line.split("\t", -1);
-                    List<String> out = new ArrayList<>();
-                    for (String h : headersToKeep) {
-                        int idx = indexByHeader.get(h);
-                        out.add(idx < cells.length ? cells[idx] : "");
-                    }
-                    bw.write(String.join(delimiter, out));
-                    bw.newLine();
-                }
-            }
-        }
-    }
-
-    /**
-     * Print de eerste n regels van een bestand.
-     */
-    public static void printFirstNLines(Path file, int n) throws IOException {
-        if (!Files.exists(file)) throw new FileNotFoundException("Bestand ontbreekt: " + file);
-        try (BufferedReader br = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-            for (int i = 0; i < n; i++) {
-                String line = br.readLine();
-                if (line == null) break;
-                System.out.println(line);
-            }
-        }
-    }
-
-    /**
-     * headers uit een TSV te printen.
-     */
-    public static void printHeaders(Path file) throws IOException {
-        try (BufferedReader br = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-            String headerLine = br.readLine();
-            if (headerLine != null) {
-                String[] headers = headerLine.split("\t", -1);
-                System.out.println("Headers in " + file + ":");
-                for (String h : headers) {
-                    System.out.println("- " + h.trim());
-                }
-            }
+        } catch (IOException e) {
+            // Geeft een foutmelding als het bestand niet gelezen kan worden
+            throw new RuntimeException("Fout bij lezen van bestand: " + file, e);
         }
     }
 }
-
-
-
-
