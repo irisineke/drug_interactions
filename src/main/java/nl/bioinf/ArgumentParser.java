@@ -2,8 +2,8 @@ package nl.bioinf;
 
 import picocli.CommandLine.*;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 
 
@@ -50,8 +50,14 @@ public class ArgumentParser implements Runnable {
             fileNotEmptyCheck("Interactions file", interactionsFile.getAbsolutePath());
             fileNotEmptyCheck("Drugs file", drugsFile.getAbsolutePath());
 
+            LeesBestanden lb = new LeesBestanden(interactionsFile,drugsFile);
+            lb.process();
 
-            prepareAndPrintData();
+            Map<String, List<String>> data = lb.process();
+
+            InteractionChecker checker = new InteractionChecker();
+            checker.run(data.get("interactions"), data.get("drugs"));
+
 
         } catch (Exception e) {
             System.err.println("❌ FOUT: " + e.getMessage());
@@ -79,51 +85,6 @@ public class ArgumentParser implements Runnable {
             throw new IllegalArgumentException("❌ FOUT: " + name + " is empty :(");
         }
     }
-
-
-    private void prepareAndPrintData() throws Exception {
-        // de paden uit de input gebruiken als raw bestanden
-        Path rawInteractions = interactionsFile.toPath();
-        Path rawDrugs = drugsFile.toPath();
-
-       // dot wordt dus nog aangepast als we in een class tijdelijk op gaan slaan !
-        Path preparedInteractions = Path.of("data/prepared/interactions.tsv");
-        Path preparedDrugs = Path.of("data/prepared/drugs.tsv");
-
-
-        List<String> keepInteractions = List.of(
-                "gene_claim_name",
-                "interaction_type",
-                "interaction_score",
-                "drug_concept_id"
-        );
-
-        List<String> keepDrugs = List.of(
-                "drug_claim_name",
-                "concept_id"
-        );
-
-        LeesBestanden preparer = new LeesBestanden(
-                rawInteractions, rawDrugs, preparedInteractions, preparedDrugs
-        );
-
-        preparer.ensurePreparedData(keepInteractions, keepDrugs);
-
-        System.out.println("✅ Prepared bestanden OK:");
-        System.out.println(" - " + preparedInteractions.toAbsolutePath());
-        System.out.println(" - " + preparedDrugs.toAbsolutePath());
-
-        System.out.println("\nVoorbeeld (eerste 2 regels interactions.tsv):");
-        LeesBestanden.printFirstNLines(preparedInteractions, 2);
-
-        System.out.println("\nVoorbeeld (eerste 2 regels drugs.tsv):");
-        LeesBestanden.printFirstNLines(preparedDrugs, 2);
-    }
-
-//    tijdleijk voor uml
-    OutputGenerator generator = new OutputGenerator();
-    InteractionChecker checker = new InteractionChecker();
-
 }
 // maakt commandline object van de class argumentparser
 //    public static void main(String[] args) {
@@ -135,3 +96,4 @@ public class ArgumentParser implements Runnable {
 
 
 // runnen: ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 a -d2 b'
+// ./gradlew run --args='-intF /home/Jonkerjas/Downloads/interactions.tsv  -drF /home/Jonkerjas/Downloads/drugs.tsv -d1 a -d2 b'
