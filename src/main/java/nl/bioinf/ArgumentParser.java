@@ -2,6 +2,7 @@ package nl.bioinf;
 
 import picocli.CommandLine.*;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,12 @@ public class ArgumentParser implements Runnable {
             required = true)
     File secondDrugInput;
 
+    @Option(names = {"-output", "-o"},
+            paramLabel = "output",
+            description = "put the path to where you want the output to land",
+            required = true)
+    Path output;
+
 
     @Override
     public void run() {
@@ -51,12 +58,13 @@ public class ArgumentParser implements Runnable {
             fileNotEmptyCheck("Drugs file", drugsFile.getAbsolutePath());
 
             LeesBestanden lb = new LeesBestanden(interactionsFile,drugsFile);
-            lb.process();
-
             Map<String, List<String>> data = lb.process();
 
             InteractionChecker checker = new InteractionChecker();
             checker.run(data.get("interactions"), data.get("drugs"));
+
+            OutputGenerator generator = new OutputGenerator(output);
+            generator.run();
 
 
         } catch (Exception e) {
@@ -95,5 +103,5 @@ public class ArgumentParser implements Runnable {
 
 
 
-// runnen: ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 a -d2 b'
+// runnen: ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 a -d2 b -o /data'
 // ./gradlew run --args='-intF /home/Jonkerjas/Downloads/interactions.tsv  -drF /home/Jonkerjas/Downloads/drugs.tsv -d1 a -d2 b'
