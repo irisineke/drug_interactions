@@ -128,7 +128,7 @@ public class ArgumentParser implements Runnable {
     }
 
 //    tijdleijk voor uml, 3e en 4e paths gaan later weg als t goed is.
-    LeesBestanden leesBestanden = new LeesBestanden(interactionsFile, drugsFile);
+    LeesBestanden leesBestanden = new LeesBestanden(interactionsFile, drugsFile, interactionsFile, drugsFile);
     InteractionChecker checker = new InteractionChecker(firstDrugInput, secondDrugInput);
     OutputGenerator generator = new OutputGenerator(output);
 
