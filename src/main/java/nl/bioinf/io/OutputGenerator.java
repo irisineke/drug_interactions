@@ -10,6 +10,10 @@ public class OutputGenerator {
         this.output = output;
     }
 
+    public static void MakeOutput(String[] args) {
+        System.out.println("-");
+    }
+
     public void run() {
         System.out.println("output path: " + output);
     }
