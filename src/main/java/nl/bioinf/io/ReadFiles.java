@@ -4,12 +4,12 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
-public class LeesBestanden {
+public class ReadFiles {
     private final File interactionsFile;
     private final File drugsFile;
 
     //Haalt de paden binnen van de ArgumentParser
-    public LeesBestanden(File interactionsFile, File drugsFile) {
+    public ReadFiles(File interactionsFile, File drugsFile) {
         this.interactionsFile = interactionsFile;
         this.drugsFile = drugsFile;
     }

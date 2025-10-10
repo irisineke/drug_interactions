@@ -1,6 +1,6 @@
 package nl.bioinf;
 
-import nl.bioinf.io.LeesBestanden;
+import nl.bioinf.io.ReadFiles;
 import nl.bioinf.io.OutputGenerator;
 import nl.bioinf.logic.InteractionChecker;
 import picocli.CommandLine.*;
@@ -60,7 +60,7 @@ public class ArgumentParser implements Runnable {
             fileNotEmptyCheck("Interactions file", interactionsFile.getAbsolutePath());
             fileNotEmptyCheck("Drugs file", drugsFile.getAbsolutePath());
 
-            LeesBestanden lb = new LeesBestanden(interactionsFile,drugsFile);
+            ReadFiles lb = new ReadFiles(interactionsFile,drugsFile);
             Map<String, List<String>> data = lb.process();
 
             InteractionChecker checker = new InteractionChecker();
