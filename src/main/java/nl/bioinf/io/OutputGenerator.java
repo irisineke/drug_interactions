@@ -1,4 +1,4 @@
-package nl.bioinf;
+package nl.bioinf.io;
 
 import java.nio.file.Path;
 

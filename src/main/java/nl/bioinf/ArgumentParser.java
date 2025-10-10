@@ -1,5 +1,8 @@
 package nl.bioinf;
 
+import nl.bioinf.io.LeesBestanden;
+import nl.bioinf.io.OutputGenerator;
+import nl.bioinf.logic.InteractionChecker;
 import picocli.CommandLine.*;
 import java.io.File;
 import java.nio.file.Path;
