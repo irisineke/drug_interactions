@@ -8,7 +8,7 @@ import java.util.List;
 
 // dummy class voor uml
 public class InteractionChecker {
-    public void run(List<String> interactions, List<String> drugs) {
+    public void CheckInteraction(List<String> interactions, List<String> drugs) {
         System.out.println("=== Interactions-File ===");
         interactions.stream().limit(5).forEach(System.out::println);;
 

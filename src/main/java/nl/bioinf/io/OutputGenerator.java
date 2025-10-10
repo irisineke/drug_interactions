@@ -14,7 +14,7 @@ public class OutputGenerator {
         System.out.println("-");
     }
 
-    public void run() {
+    public void GenerateOutput() {
         System.out.println("output path: " + output);
     }
 }

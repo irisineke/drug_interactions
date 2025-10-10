@@ -64,10 +64,10 @@ public class ArgumentParser implements Runnable {
             Map<String, List<String>> data = lb.process();
 
             InteractionChecker checker = new InteractionChecker();
-            checker.run(data.get("interactions"), data.get("drugs"));
+            checker.CheckInteraction(data.get("interactions"), data.get("drugs"));
 
             OutputGenerator generator = new OutputGenerator(output);
-            generator.run();
+            generator.GenerateOutput();
 
 
         } catch (Exception e) {
