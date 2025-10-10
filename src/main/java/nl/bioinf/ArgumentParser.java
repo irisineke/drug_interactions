@@ -30,19 +30,19 @@ public class ArgumentParser implements Runnable {
             required = true)
     File drugsFile;
 
-    @Option(names = {"-drug1", "-d1"},
+    @Option(names = {"--drug1", "-d1"},
             paramLabel = "firstDrugInput",
             description = "put the first drug you want to compare here",
             required = true)
-    File firstDrugInput;
+    String firstDrugInput;
 
-    @Option(names = {"-drug2", "-d2"},
+    @Option(names = {"--drug2", "-d2"},
             paramLabel = "secondDrugInput",
             description = "put the second drug you want to compare here",
             required = true)
-    File secondDrugInput;
+    String secondDrugInput;
 
-    @Option(names = {"-output", "-o"},
+    @Option(names = {"--output", "-o"},
             paramLabel = "output",
             description = "put the path to where you want the output to land",
             required = true)
