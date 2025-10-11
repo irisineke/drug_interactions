@@ -1,5 +1,7 @@
 package nl.bioinf.io;
 
+import nl.bioinf.methods.Placeholder;
+
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
@@ -59,7 +61,7 @@ public class LeesBestanden {
             // Maakt een nieuwe lijst om de gefilterde regels op te slaan
             List<String> result = new ArrayList<>();
             result.add(String.join("\t", keepCols)); // headerregel
-
+            Placeholder placeholder = new Placeholder();
             // Loopt door alle dataregels in het bestand
             for (int i = 1; i < lines.size(); i++) {
                 String[] parts = lines.get(i).split("\t", -1);
