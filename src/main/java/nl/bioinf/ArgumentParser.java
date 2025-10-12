@@ -7,7 +7,8 @@ import picocli.CommandLine.*;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
+import nl.bioinf.methods.Interaction;
+import nl.bioinf.methods.Drug;
 
 
 
@@ -60,11 +61,13 @@ public class ArgumentParser implements Runnable {
             fileNotEmptyCheck("Interactions file", interactionsFile.getAbsolutePath());
             fileNotEmptyCheck("Drugs file", drugsFile.getAbsolutePath());
 
-            LeesBestanden lb = new LeesBestanden(interactionsFile,drugsFile);
-            Map<String, List<String>> data = lb.process();
+            LeesBestanden lb = new LeesBestanden(interactionsFile, drugsFile);
+            List<Interaction> interactions = lb.processInteractions();
+            List<Drug> drugs = lb.processDrugs();
 
             InteractionChecker checker = new InteractionChecker();
-            checker.run(data.get("interactions"), data.get("drugs"));
+            checker.test(interactions, drugs, firstDrugInput, secondDrugInput); // pas die signature aan in je checker
+
 
             OutputGenerator generator = new OutputGenerator(output);
             generator.run();
