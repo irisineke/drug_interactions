@@ -1,79 +1,87 @@
 package nl.bioinf.io;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import nl.bioinf.methods.Drug;
+import nl.bioinf.methods.Interaction;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReadFiles {
+
     private final File interactionsFile;
     private final File drugsFile;
 
-    //Haalt de paden binnen van de ArgumentParser
-    public ReadFiles(File interactionsFile, File drugsFile) {
+    public LeesBestanden(File interactionsFile, File drugsFile) {
         this.interactionsFile = interactionsFile;
         this.drugsFile = drugsFile;
     }
 
-    public Map<String, List<String>> process() {
-        //filterd op benodigde collomen
-        List<String> interactions = filterFile(interactionsFile, List.of(
-                "gene_claim_name",
-                "interaction_type",
-                "interaction_score",
-                "drug_concept_id"
-        ));
-
-        List<String> drugs = filterFile(drugsFile, List.of(
-                "drug_claim_name",
-                "concept_id"
-        ));
-
-        // Maakt een nieuwe Map aan in het geheugen om de resultaten op te slaan
-        Map<String, List<String>> result = new HashMap<>();
-        // Slaat de interactiegegevens op onder de sleutel "interactions"
-        result.put("interactions", interactions);
-        // Slaat de geneesmiddelgegevens op onder de sleutel "drugs"
-        result.put("drugs", drugs);
-        // Geeft de samengestelde Map terug
-        return result;
+    public List<Interaction> processInteractions() {
+        return readInteractions(interactionsFile);
     }
 
+    public List<Drug> processDrugs() {
+        return readDrugs(drugsFile);
+    }
 
-    // Filtert een bestand op opgegeven kolommen en leest alle rijen
-    private List<String> filterFile(File file, List<String> keepCols) {
+    private List<Interaction> readInteractions(File file) {
         try {
-            // Leest alle regels uit het bestand
             List<String> lines = Files.readAllLines(file.toPath());
-            if (lines.isEmpty()) return Collections.emptyList();
+            if (lines.isEmpty()) return List.of();
 
-            // Leest de headerregel (eerste regel) en splitst deze op tabs
-            String headerLine = lines.get(0);
-            String[] headers = headerLine.split("\t");
+            String[] headers = lines.get(0).split("\t", -1);
+            int idxGene = indexOf(headers, "gene_claim_name");
+            int idxType = indexOf(headers, "interaction_type");
+            int idxScore = indexOf(headers, "interaction_score");
+            int idxDrug  = indexOf(headers, "drug_concept_id");
 
-            // Bepaalt welke kolommen behouden moeten blijven
-            List<Integer> keepIndexes = new ArrayList<>();
-            for (int i = 0; i < headers.length; i++) {
-                if (keepCols.contains(headers[i])) keepIndexes.add(i);
-            }
-
-            // Maakt een nieuwe lijst om de gefilterde regels op te slaan
-            List<String> result = new ArrayList<>();
-            result.add(String.join("\t", keepCols)); // headerregel
-
-            // Loopt door alle dataregels in het bestand
+            List<Interaction> result = new ArrayList<>();
             for (int i = 1; i < lines.size(); i++) {
-                String[] parts = lines.get(i).split("\t", -1);
-                List<String> filtered = new ArrayList<>();
-                for (int idx : keepIndexes) filtered.add(parts[idx]);
-                result.add(String.join("\t", filtered));
+                String line = lines.get(i);
+                if (line.isBlank()) continue;
+                String[] parts = line.split("\t", -1);
+                result.add(new Interaction(
+                        parts[idxGene],
+                        parts[idxType],
+                        parts[idxScore],
+                        parts[idxDrug]
+                ));
             }
-
-            // Geeft de gefilterde regels terug
             return result;
-
         } catch (IOException e) {
-            // Geeft een foutmelding als het bestand niet gelezen kan worden
-            throw new RuntimeException("Fout bij lezen van bestand: " + file, e);
+            throw new RuntimeException("Fout bij lezen: " + file, e);
         }
+    }
+
+    private List<Drug> readDrugs(File file) {
+        try {
+            List<String> lines = Files.readAllLines(file.toPath());
+            if (lines.isEmpty()) return List.of();
+
+            String[] headers = lines.get(0).split("\t", -1);
+            int idxName = indexOf(headers, "drug_claim_name");
+            int idxId   = indexOf(headers, "concept_id");
+
+            List<Drug> result = new ArrayList<>();
+            for (int i = 1; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.isBlank()) continue;
+                String[] parts = line.split("\t", -1);
+                result.add(new Drug(parts[idxName], parts[idxId]));
+            }
+            return result;
+        } catch (IOException e) {
+            throw new RuntimeException("Fout bij lezen: " + file, e);
+        }
+    }
+
+    private int indexOf(String[] headers, String name) {
+        for (int i = 0; i < headers.length; i++) {
+            if (headers[i].equals(name)) return i;
+        }
+        throw new IllegalArgumentException("Header niet gevonden: " + name);
     }
 }
