@@ -1,6 +1,6 @@
 package nl.bioinf;
 
-import nl.bioinf.io.LeesBestanden;
+import nl.bioinf.io.ReadFiles;
 import nl.bioinf.io.OutputGenerator;
 import nl.bioinf.logic.InteractionChecker;
 import picocli.CommandLine.*;
@@ -13,10 +13,10 @@ import nl.bioinf.methods.Drug;
 
 
 // name, help en version erin, description
-@Command (name = "argumentparser",
+@Command (name = "Drug Interactions",
         mixinStandardHelpOptions = true,
-        version = "argumentparser 1.0",
-        description = "handels the argument input")
+        version = "Drug Interactions 1.0",
+        description = "This program uses two drug inputs and two file inputs (drug.tsv and interaction.tsv) and performs an assessment. The program then assesses whether these can be safely combined. The program does not offer binding medical advice, but rather indicative support to identify potential risks at an earlier stage.\n")
 
 
 // Callable: Integer of wat anders teruggeven ?
@@ -24,13 +24,13 @@ public class ArgumentParser implements Runnable {
 //    vangt input file op
     @Option(names = { "-intF", "--interactionsFile" },
             paramLabel = "interactionsFile", // zo heet hij in help
-            description = "the input file: interactions.tsv", // ook in help
+            description = "the input file. for example: interactions.tsv", // ook in help
             required = true)
     File interactionsFile;
 
     @Option(names = { "-drF", "--drugsFile" },
             paramLabel = "drugsFile", // zo heet hij in help
-            description = "the input file: drugs.tsv", // ook in help
+            description = "the input file. for example: drugs.tsv", // ook in help
             required = true)
     File drugsFile;
 
@@ -61,7 +61,7 @@ public class ArgumentParser implements Runnable {
             fileNotEmptyCheck("Interactions file", interactionsFile.getAbsolutePath());
             fileNotEmptyCheck("Drugs file", drugsFile.getAbsolutePath());
 
-            LeesBestanden lb = new LeesBestanden(interactionsFile, drugsFile);
+            ReadFiles lb = new ReadFiles(interactionsFile, drugsFile);
             List<Interaction> interactions = lb.processInteractions();
             List<Drug> drugs = lb.processDrugs();
 
@@ -70,12 +70,12 @@ public class ArgumentParser implements Runnable {
 
 
             OutputGenerator generator = new OutputGenerator(output);
-            generator.run();
+            generator.GenerateOutput();
 
 
         } catch (Exception e) {
-            System.err.println("❌ FOUT: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println(e.getMessage());
+//            e.printStackTrace(); // alleen gebruiken bij testen
             System.exit(1);
         }
     }
@@ -109,5 +109,12 @@ public class ArgumentParser implements Runnable {
 
 
 
-// runnen: ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 a -d2 b -o /data'
+// runnen zonder shadow jar:
+// ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 a -d2 b -o /data'
 // ./gradlew run --args='-intF /home/Jonkerjas/Downloads/interactions.tsv  -drF /home/Jonkerjas/Downloads/drugs.tsv -d1 a -d2 b -o /data'
+
+
+// met shadowjar: eerst op schadowjar klikken (in Gradle, rechts -->)
+// java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar -intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 a -d2 b -o /data
+// java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar -intF /home/Jonkerjas/Downloads/interactions.tsv  -drF /home/Jonkerjas/Downloads/drugs.tsv -d1 a -d2 b -o /data
+

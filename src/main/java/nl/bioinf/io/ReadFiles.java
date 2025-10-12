@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LeesBestanden {
+public class ReadFiles {
 
     private final File interactionsFile;
     private final File drugsFile;
