@@ -65,7 +65,23 @@ public class InteractionChecker {
                 .collect(Collectors.toSet()); // bewaart in set
 
 // Overlap tussen genen vinden
+        Set<String> overlap = genesDrug1.stream() // eerste alle genen van drug1 pakken
+            .filter(genesDrug2::contains) // bewaar alleen die die ook in drug 2 voorkomen
+            .collect(Collectors.toSet());
 
+        // ! door translate gegooid, later ms correct engels maken
+        System.out.println("Number of genes influenced by " + firstDrugInput + ": " + genesDrug1.size());
+        System.out.println("Number of genes influenced by " + secondDrugInput + ": " + genesDrug2.size());
+
+
+        // printen overlap: wat als er geen overlap is, en else print alle overlap genen:
+        if (overlap.isEmpty()){
+            System.out.println("No overlap found.");}
+        else {
+            System.out.println("Number of overlapping genes: " + overlap.size());
+            System.out.println("Overlapping genes: ");
+            overlap.forEach(System.out::println); // print alle regels uit overlap
+        }
     }
     public static void GetDrugsID(String[] args) {
         System.out.println("-");

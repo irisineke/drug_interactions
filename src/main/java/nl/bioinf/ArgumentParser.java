@@ -118,3 +118,10 @@ public class ArgumentParser implements Runnable {
 // java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar -intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 a -d2 b -o /data
 // java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar -intF /home/Jonkerjas/Downloads/interactions.tsv  -drF /home/Jonkerjas/Downloads/drugs.tsv -d1 a -d2 b -o /data
 
+
+//Met test genen er ook bij:
+// voor checken overlap:
+// ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 clonidine -d2 Compro -o /data'
+// voor checken geen overlap:
+// ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 Savella -d2 Acthar -o /data'
+
