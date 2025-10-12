@@ -1,5 +1,6 @@
 package nl.bioinf.logic;
 
+import nl.bioinf.io.OutputGenerator;
 import nl.bioinf.methods.Drug;
 import nl.bioinf.methods.Interaction;
 
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class InteractionChecker {
 
-    public void test(List<Interaction> interactions,
+    public Set<String> geneOverlap(List<Interaction> interactions,
                     List<Drug> drugs,
                     String firstDrugInput,
                     String secondDrugInput) {
@@ -82,10 +83,12 @@ public class InteractionChecker {
             System.out.println("Overlapping genes: ");
             overlap.forEach(System.out::println); // print alle regels uit overlap
         }
+
+        return overlap; // overlap teruggeven aan ArgumentParser
     }
-    public static void GetDrugsID(String[] args) {
-        System.out.println("-");
-    }
+
+
+
 
     public static void GetInteraction(String[] args) {
         System.out.println("-");
