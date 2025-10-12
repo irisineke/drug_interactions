@@ -14,7 +14,7 @@ public class ReadFiles {
     private final File interactionsFile;
     private final File drugsFile;
 
-    public LeesBestanden(File interactionsFile, File drugsFile) {
+    public ReadFiles(File interactionsFile, File drugsFile) {
         this.interactionsFile = interactionsFile;
         this.drugsFile = drugsFile;
     }
