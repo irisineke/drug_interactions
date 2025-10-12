@@ -7,6 +7,8 @@ import picocli.CommandLine.*;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
+
 import nl.bioinf.methods.Interaction;
 import nl.bioinf.methods.Drug;
 
@@ -66,11 +68,11 @@ public class ArgumentParser implements Runnable {
             List<Drug> drugs = lb.processDrugs();
 
             InteractionChecker checker = new InteractionChecker();
-            checker.test(interactions, drugs, firstDrugInput, secondDrugInput); // pas die signature aan in je checker
+            Set<String> overlap = checker.geneOverlap(interactions, drugs, firstDrugInput, secondDrugInput);
 
 
             OutputGenerator generator = new OutputGenerator(output);
-            generator.GenerateOutput();
+            generator.generateOutput(overlap);
 
 
         } catch (Exception e) {
@@ -117,4 +119,11 @@ public class ArgumentParser implements Runnable {
 // met shadowjar: eerst op schadowjar klikken (in Gradle, rechts -->)
 // java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar -intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 a -d2 b -o /data
 // java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar -intF /home/Jonkerjas/Downloads/interactions.tsv  -drF /home/Jonkerjas/Downloads/drugs.tsv -d1 a -d2 b -o /data
+
+
+//Met test genen er ook bij:
+// voor checken overlap:
+// ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 clonidine -d2 Compro -o /Users/irisineke/Downloads/test_overlap.txt'
+// voor checken geen overlap:
+// ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 Savella -d2 Acthar -o /Users/irisineke/Downloads/test_overlap.txt'
 
