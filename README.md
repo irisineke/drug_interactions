@@ -17,5 +17,13 @@ This project uses two drug inputs and two file inputs (drug.tsv and interaction.
 #### Step 1:
 Download the data from the [drugbank site](https://dgidb.org/downloads).
 
+#### Step 2:
+Clone the Repository: git@github.com:irisineke/drug_interactions.git.
 
-etc.
+
+
+### How to run the code:
+java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar -intF Path/To/interactions.tsv -drF Path/To/drugs.tsv -d1 first_drug_of_choice -d2 second_drug_of_choice -o Path/To/Output
+
+*Example with filled in drugs:*
+java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar -intF Path/To/interactions.tsv -drF Path/To/drugs.tsv -d1 clonidine -d2 Compro -o Path/To/Output
