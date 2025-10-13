@@ -52,7 +52,7 @@ public class ReadFiles {
             }
             return result;
         } catch (IOException e) {
-            throw new RuntimeException("Fout bij lezen: " + file, e);
+            throw new RuntimeException("Error reading file: " + file, e);
         }
     }
 
@@ -74,7 +74,7 @@ public class ReadFiles {
             }
             return result;
         } catch (IOException e) {
-            throw new RuntimeException("Fout bij lezen: " + file, e);
+            throw new RuntimeException("Error reading file: " + file, e);
         }
     }
 
@@ -82,6 +82,6 @@ public class ReadFiles {
         for (int i = 0; i < headers.length; i++) {
             if (headers[i].equals(name)) return i;
         }
-        throw new IllegalArgumentException("Header niet gevonden: " + name);
+        throw new IllegalArgumentException("Header not found: " + name);
     }
 }

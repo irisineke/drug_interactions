@@ -89,25 +89,20 @@ public class ArgumentParser implements Runnable {
 
         // checken of opgegeven file bestaat
         if (!file.exists()) {
-            throw new IllegalArgumentException("❌ FOUT: " + name + " does not exist :(");
+            throw new IllegalArgumentException("❌ ERROR: " + name + " does not exist :(");
         }
         // checken of opgegeven file daadwerklijk een file is (super handig) (ipv directory bv)
         if (!file.isFile()){
-            throw new IllegalArgumentException("❌ FOUT: " + name + " is not a file :(");
+            throw new IllegalArgumentException("❌ ERROR: " + name + " is not a file :(");
         }
         // checken of file niet leeg is
             // ! moest dit nou met == of .equals ?
         if (file.length() == 0) {
-            throw new IllegalArgumentException("❌ FOUT: " + name + " is empty :(");
+            throw new IllegalArgumentException("❌ ERROR: " + name + " is empty :(");
         }
     }
 }
-// maakt commandline object van de class argumentparser
-//    public static void main(String[] args) {
-//        int exitCode = new picocli.CommandLine(new ArgumentParser()).execute(args);
-//        System.exit(exitCode); // geef mee aan het systeem of het goed gaat (0 of 1)
-//          System.exit(new CommandLine(new MyApp()).execute(args));
-//    }
+
 
 
 

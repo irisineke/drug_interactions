@@ -21,27 +21,8 @@ public class InteractionChecker {
         System.out.println("Drug 2 input: " + secondDrugInput);
         System.out.println();
 
-//        System.out.println("=== Eerste 5 regels uit interactions.tsv ===");
-//        interactions.stream()
-//                .limit(5)
-//                .forEach(i -> System.out.println(
-//                        i.geneClaimName() + "\t" +
-//                                i.interactionType() + "\t" +
-//                                i.interactionScore() + "\t" +
-//                                i.drugConceptId()
-//                ));
 
-//        System.out.println();
-//        System.out.println("=== Eerste 5 regels uit drugs.tsv ===");
-//        drugs.stream()
-//                .limit(5)
-//                .forEach(d -> System.out.println(
-//                        d.drugClaimName() + "\t" +
-//                                d.conceptId()
-//                ));
-
-//  concept id v`n opgegeven drugnaam ophalen
-        // met stream erdoorheen loopen
+//  concept id van opgegeven drugnaam ophalen
         String idDrug1 = drugs.stream()
                 .filter(drug -> drug.drugClaimName().equalsIgnoreCase(firstDrugInput)) // gebruikt getter
                 .map(Drug::conceptId) // pakt concept id
