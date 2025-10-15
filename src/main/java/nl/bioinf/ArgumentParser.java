@@ -128,3 +128,8 @@ public class ArgumentParser implements Runnable {
 // voor checken geen overlap:
 // ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 Savella -d2 Acthar -o /Users/irisineke/Downloads/test_overlap.txt'
 
+// voor checken combinaties:
+// ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 clonidine -d2 dicyclomine -o /Users/irisineke/Downloads/test_overlap.txt'
+// voor checken geen resultaat (door null of unknown):
+// ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 clonidine -d2 Compro -o /Users/irisineke/Downloads/test_overlap.txt'
+

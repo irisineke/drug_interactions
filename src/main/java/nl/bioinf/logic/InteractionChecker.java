@@ -32,7 +32,7 @@ public class InteractionChecker {
         System.out.println("==== Find overlap genes ==== ");
         System.out.println("Drug 1 input: " + firstDrugInput);
         System.out.println("Drug 2 input: " + secondDrugInput);
-        System.out.println();
+        System.out.println(" ");
 
 
 // genen ophalen die drug beïnvloeden
@@ -101,11 +101,6 @@ public class InteractionChecker {
                 .orElse("Unkown");
 
 
-        System.out.println("==== Find type drugs ==== ");
-        System.out.println(firstDrugInput + " type: " + typeDrug1);
-        System.out.println(secondDrugInput + " type: " + typeDrug2);
-        System.out.println();
-
         return new String[]{typeDrug1, typeDrug2};
     }
 
@@ -120,7 +115,13 @@ public class InteractionChecker {
         String typeDrug1 = types[0];
         String typeDrug2 = types[1];
 
-        // stay with me: zoekt naar de types in de drug_combination.tsv en geeft resultaat (kolom met combinatie resultaat) terug
+        System.out.println("==== Find type drugs ==== ");
+        System.out.println(firstDrugInput + " type: " + typeDrug1);
+        System.out.println(secondDrugInput + " type: " + typeDrug2);
+        System.out.println();
+
+        // stay with me:
+        // zoekt naar de types in de drug_combination.tsv en geeft resultaat (kolom met combinatie resultaat) terug
         for (Combination comb : combinations) {
             boolean match = comb.drugType1().equalsIgnoreCase(typeDrug1) && comb.drugType2().equalsIgnoreCase(typeDrug2) ||
                     comb.drugType1().equalsIgnoreCase(typeDrug2) && comb.drugType2().equalsIgnoreCase(typeDrug1);
@@ -132,12 +133,13 @@ public class InteractionChecker {
                 return comb.resultaat();
             }
         }
-        return "Unkown";
-    }
+
+        System.out.println("==== Combination drugs Result ==== ");
+        System.out.println("Combination result is unknown");
+        System.out.println();
+        return "Unknown";
+        }
 }
 
 
-
-// run test line:
-//./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 clonidine -d2 dicyclomine -o /Users/irisineke/Downloads/test_overlap.txt'
 
