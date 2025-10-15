@@ -78,12 +78,10 @@ public class InteractionChecker {
         System.out.println("-");
     }
 
-    public static String CompareInteractionTypes(List<Interaction> interactions,
+    public static String getInteractionTypes(List<Interaction> interactions,
                                                List<Drug> drugs,
                                                String firstDrugInput,
                                                String secondDrugInput) {
-
-//        interaction_type
 
         String idDrug1 = getConceptID(drugs, firstDrugInput);
         String idDrug2 = getConceptID(drugs, secondDrugInput);
@@ -103,10 +101,20 @@ public class InteractionChecker {
 
 
         System.out.println("==== Find type drugs ==== ");
-        System.out.println("Drug 1 type: " + typeDrug1);
-        System.out.println("Drug 2 type: " + typeDrug2);
+        System.out.println(firstDrugInput + " type: " + typeDrug1);
+        System.out.println(secondDrugInput + " type: " + typeDrug2);
         System.out.println();
 
         return typeDrug1 + typeDrug2;
-    }}
+
+
+
+
+    }
+}
+
+
+
+// run test line:
+//./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 clonidine -d2 dicyclomine -o /Users/irisineke/Downloads/test_overlap.txt'
 

@@ -1,4 +1,4 @@
-drug 1	drug 2	resultaat
+drugtype_1	drugtype_2	resultaat
 activator	activator	Versterkend
 activator	agonist	Versterkend (activator versterkt agonist)
 activator	antibody	meestal tegenwerkend (antibody blokkeert doelwit)

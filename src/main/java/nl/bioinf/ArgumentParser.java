@@ -1,6 +1,6 @@
 package nl.bioinf;
 
-import nl.bioinf.io.ReadFiles;
+import nl.bioinf.io.*;
 import nl.bioinf.io.OutputGenerator;
 import nl.bioinf.logic.InteractionChecker;
 import picocli.CommandLine.*;
@@ -11,6 +11,7 @@ import java.util.Set;
 
 import nl.bioinf.methods.Interaction;
 import nl.bioinf.methods.Drug;
+import nl.bioinf.methods.Combination;
 
 
 
@@ -66,10 +67,12 @@ public class ArgumentParser implements Runnable {
             ReadFiles lb = new ReadFiles(interactionsFile, drugsFile);
             List<Interaction> interactions = lb.processInteractions();
             List<Drug> drugs = lb.processDrugs();
+            List<Combination> combinations = lb.processCombinations();
+
 
             InteractionChecker checker = new InteractionChecker();
             Set<String> overlap = checker.geneOverlap(interactions, drugs, firstDrugInput, secondDrugInput);
-            String type = checker.CompareInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
+            String type = checker.getInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
 
 
 
