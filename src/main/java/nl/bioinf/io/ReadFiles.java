@@ -28,54 +28,82 @@ public class ReadFiles {
     }
 
     private List<Interaction> readInteractions(File file) {
+        List<String> lines;
         try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            if (lines.isEmpty()) return List.of();
-
-            String[] headers = lines.get(0).split("\t", -1);
-            int idxGene = indexOf(headers, "gene_claim_name");
-            int idxType = indexOf(headers, "interaction_type");
-            int idxScore = indexOf(headers, "interaction_score");
-            int idxDrug  = indexOf(headers, "drug_concept_id");
-
-            List<Interaction> result = new ArrayList<>();
-            for (int i = 1; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.isBlank()) continue;
-                String[] parts = line.split("\t", -1);
-                result.add(new Interaction(
-                        parts[idxGene],
-                        parts[idxType],
-                        parts[idxScore],
-                        parts[idxDrug]
-                ));
-            }
-            return result;
+            lines = Files.readAllLines(file.toPath());
         } catch (IOException e) {
             throw new RuntimeException("Error reading file: " + file, e);
         }
+
+        if (lines.isEmpty()) {
+            throw new IllegalArgumentException("Input file " + file.getName() + " is empty!");
+        }
+
+        if (!file.getName().toLowerCase().endsWith(".tsv")) {
+            throw new IllegalArgumentException("File " + file.getName() + " is not a .tsv file!");
+        }
+
+        String[] headers = lines.getFirst().split("\t", -1);
+
+        assertColumnExists(headers, "gene_claim_name", file);
+        assertColumnExists(headers, "interaction_type", file);
+        assertColumnExists(headers, "interaction_score", file);
+        assertColumnExists(headers, "drug_concept_id", file);
+
+        int idxGene  = indexOf(headers, "gene_claim_name");
+        int idxType  = indexOf(headers, "interaction_type");
+        int idxScore = indexOf(headers, "interaction_score");
+        int idxDrug  = indexOf(headers, "drug_concept_id");
+
+        List<Interaction> result = new ArrayList<>();
+        for (int i = 1; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.isBlank()) continue;
+
+            String[] parts = line.split("\t", -1);
+            result.add(new Interaction(
+                    parts[idxGene],
+                    parts[idxType],
+                    parts[idxScore],
+                    parts[idxDrug]
+            ));
+        }
+        return result;
     }
 
     private List<Drug> readDrugs(File file) {
+        List<String> lines;
         try {
-            List<String> lines = Files.readAllLines(file.toPath());
-            if (lines.isEmpty()) return List.of();
-
-            String[] headers = lines.get(0).split("\t", -1);
-            int idxName = indexOf(headers, "drug_claim_name");
-            int idxId   = indexOf(headers, "concept_id");
-
-            List<Drug> result = new ArrayList<>();
-            for (int i = 1; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.isBlank()) continue;
-                String[] parts = line.split("\t", -1);
-                result.add(new Drug(parts[idxName], parts[idxId]));
-            }
-            return result;
+            lines = Files.readAllLines(file.toPath());
         } catch (IOException e) {
             throw new RuntimeException("Error reading file: " + file, e);
         }
+
+        if (lines.isEmpty()) {
+            throw new IllegalArgumentException("Input file " + file.getName() + " is empty!");
+        }
+
+        if (!file.getName().toLowerCase().endsWith(".tsv")) {
+            throw new IllegalArgumentException("File " + file.getName() + " is not a .tsv file!");
+        }
+
+        String[] headers = lines.getFirst().split("\t", -1);
+
+        assertColumnExists(headers, "drug_claim_name", file);
+        assertColumnExists(headers, "concept_id", file);
+
+        int idxName = indexOf(headers, "drug_claim_name");
+        int idxId   = indexOf(headers, "concept_id");
+
+        List<Drug> result = new ArrayList<>();
+        for (int i = 1; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.isBlank()) continue;
+
+            String[] parts = line.split("\t", -1);
+            result.add(new Drug(parts[idxName], parts[idxId]));
+        }
+        return result;
     }
 
     private int indexOf(String[] headers, String name) {
@@ -83,5 +111,14 @@ public class ReadFiles {
             if (headers[i].equals(name)) return i;
         }
         throw new IllegalArgumentException("Header not found: " + name);
+    }
+
+    private void assertColumnExists(String[] headers, String columnName, File file) {
+        for (String header : headers) {
+            if (header.equals(columnName)) return;
+        }
+        throw new IllegalArgumentException(
+                "Required column '" + columnName + "' not found in file: " + file.getName()
+        );
     }
 }
