@@ -1,6 +1,7 @@
 package nl.bioinf.logic;
 
 import nl.bioinf.io.OutputGenerator;
+import nl.bioinf.methods.Combination;
 import nl.bioinf.methods.Drug;
 import nl.bioinf.methods.Interaction;
 
@@ -78,7 +79,7 @@ public class InteractionChecker {
         System.out.println("-");
     }
 
-    public static String getInteractionTypes(List<Interaction> interactions,
+    public static String[] getInteractionTypes(List<Interaction> interactions,
                                                List<Drug> drugs,
                                                String firstDrugInput,
                                                String secondDrugInput) {
@@ -105,11 +106,33 @@ public class InteractionChecker {
         System.out.println(secondDrugInput + " type: " + typeDrug2);
         System.out.println();
 
-        return typeDrug1 + typeDrug2;
+        return new String[]{typeDrug1, typeDrug2};
+    }
 
 
+    public static String getCombinationResult(List<Interaction> interactions,
+                                              List<Drug> drugs,
+                                              String firstDrugInput,
+                                              String secondDrugInput,
+                                              List<Combination> combinations) {
 
+        String[] types = getInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
+        String typeDrug1 = types[0];
+        String typeDrug2 = types[1];
 
+        // stay with me: zoekt naar de types in de drug_combination.tsv en geeft resultaat (kolom met combinatie resultaat) terug
+        for (Combination comb : combinations) {
+            boolean match = comb.drugType1().equalsIgnoreCase(typeDrug1) && comb.drugType2().equalsIgnoreCase(typeDrug2) ||
+                    comb.drugType1().equalsIgnoreCase(typeDrug2) && comb.drugType2().equalsIgnoreCase(typeDrug1);
+
+            if (match) {
+                System.out.println("==== Combination drugs Result ==== ");
+                System.out.println("Combination result: " + comb.resultaat());
+                System.out.println();
+                return comb.resultaat();
+            }
+        }
+        return "Unkown";
     }
 }
 
