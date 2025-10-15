@@ -35,12 +35,23 @@ public class ReadFiles {
             throw new RuntimeException("Error reading file: " + file, e);
         }
 
-        // Alleen jouw validaties (niet-leeg, .tsv, verplichte kolommen)
-        String[] headers = validateAndGetHeaders(file, lines,
-                "gene_claim_name", "interaction_type", "interaction_score", "drug_concept_id");
+        if (lines.isEmpty()) {
+            throw new IllegalArgumentException("Input file " + file.getName() + " is empty!");
+        }
 
-        int idxGene = indexOf(headers, "gene_claim_name");
-        int idxType = indexOf(headers, "interaction_type");
+        if (!file.getName().toLowerCase().endsWith(".tsv")) {
+            throw new IllegalArgumentException("File " + file.getName() + " is not a .tsv file!");
+        }
+
+        String[] headers = lines.getFirst().split("\t", -1);
+
+        assertColumnExists(headers, "gene_claim_name", file);
+        assertColumnExists(headers, "interaction_type", file);
+        assertColumnExists(headers, "interaction_score", file);
+        assertColumnExists(headers, "drug_concept_id", file);
+
+        int idxGene  = indexOf(headers, "gene_claim_name");
+        int idxType  = indexOf(headers, "interaction_type");
         int idxScore = indexOf(headers, "interaction_score");
         int idxDrug  = indexOf(headers, "drug_concept_id");
 
@@ -48,6 +59,7 @@ public class ReadFiles {
         for (int i = 1; i < lines.size(); i++) {
             String line = lines.get(i);
             if (line.isBlank()) continue;
+
             String[] parts = line.split("\t", -1);
             result.add(new Interaction(
                     parts[idxGene],
@@ -67,9 +79,18 @@ public class ReadFiles {
             throw new RuntimeException("Error reading file: " + file, e);
         }
 
-        // Alleen jouw validaties (niet-leeg, .tsv, verplichte kolommen)
-        String[] headers = validateAndGetHeaders(file, lines,
-                "drug_claim_name", "concept_id");
+        if (lines.isEmpty()) {
+            throw new IllegalArgumentException("Input file " + file.getName() + " is empty!");
+        }
+
+        if (!file.getName().toLowerCase().endsWith(".tsv")) {
+            throw new IllegalArgumentException("File " + file.getName() + " is not a .tsv file!");
+        }
+
+        String[] headers = lines.getFirst().split("\t", -1);
+
+        assertColumnExists(headers, "drug_claim_name", file);
+        assertColumnExists(headers, "concept_id", file);
 
         int idxName = indexOf(headers, "drug_claim_name");
         int idxId   = indexOf(headers, "concept_id");
@@ -78,25 +99,11 @@ public class ReadFiles {
         for (int i = 1; i < lines.size(); i++) {
             String line = lines.get(i);
             if (line.isBlank()) continue;
+
             String[] parts = line.split("\t", -1);
             result.add(new Drug(parts[idxName], parts[idxId]));
         }
         return result;
-    }
-
-    /** Doet exact: (1) niet-leeg, (2) .tsv, (3) verplichte kolommen aanwezig. */
-    private String[] validateAndGetHeaders(File file, List<String> lines, String... requiredColumns) {
-        if (lines.isEmpty()) {
-            throw new IllegalArgumentException("Input file " + file.getName() + " is empty!");
-        }
-        if (!file.getName().toLowerCase().endsWith(".tsv")) {
-            throw new IllegalArgumentException("File " + file.getName() + " is not a .tsv file!");
-        }
-        String[] headers = lines.get(0).split("\t", -1);
-        for (String col : requiredColumns) {
-            assertColumnExists(headers, col, file);
-        }
-        return headers;
     }
 
     private int indexOf(String[] headers, String name) {
@@ -115,4 +122,3 @@ public class ReadFiles {
         );
     }
 }
-
