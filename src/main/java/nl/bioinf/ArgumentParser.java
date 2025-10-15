@@ -69,6 +69,8 @@ public class ArgumentParser implements Runnable {
 
             InteractionChecker checker = new InteractionChecker();
             Set<String> overlap = checker.geneOverlap(interactions, drugs, firstDrugInput, secondDrugInput);
+            String type = checker.CompareInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
+
 
 
             OutputGenerator generator = new OutputGenerator(output);

@@ -78,7 +78,7 @@ public class InteractionChecker {
         System.out.println("-");
     }
 
-    public static void CompareInteractionTypes(List<Interaction> interactions,
+    public static String CompareInteractionTypes(List<Interaction> interactions,
                                                List<Drug> drugs,
                                                String firstDrugInput,
                                                String secondDrugInput) {
@@ -88,7 +88,25 @@ public class InteractionChecker {
         String idDrug1 = getConceptID(drugs, firstDrugInput);
         String idDrug2 = getConceptID(drugs, secondDrugInput);
 
+        // interaction_type ophalen van drug (niet volgorde influenced)
+        String typeDrug1 = interactions.stream()
+                .filter(interaction -> interaction.drugConceptId().equals(idDrug1))
+                .map(Interaction::interactionType)
+                .findFirst()
+                .orElse("Unkown");
+
+        String typeDrug2 = interactions.stream()
+                .filter(interaction -> interaction.drugConceptId().equals(idDrug2))
+                .map(Interaction::interactionType)
+                .findFirst()
+                .orElse("Unkown");
 
 
-}}
+        System.out.println("==== Find type drugs ==== ");
+        System.out.println("Drug 1 type: " + typeDrug1);
+        System.out.println("Drug 2 type: " + typeDrug2);
+        System.out.println();
+
+        return typeDrug1 + typeDrug2;
+    }}
 
