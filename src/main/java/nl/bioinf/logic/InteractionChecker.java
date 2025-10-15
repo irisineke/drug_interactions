@@ -11,29 +11,28 @@ import java.util.List;
 
 public class InteractionChecker {
 
+    private static String getConceptID(List<Drug> drugs, String drugInput){
+        return drugs.stream()
+                .filter(drug -> drug.drugClaimName().equalsIgnoreCase(drugInput)) // gebruikt getter
+                .map(Drug::conceptId) // pakt concept id
+                .findFirst() // pakt eerste (en als t goed is enige) match
+                .orElseThrow(()-> new IllegalArgumentException("Drug not found: " + drugInput));
+    }
+
     public Set<String> geneOverlap(List<Interaction> interactions,
-                    List<Drug> drugs,
-                    String firstDrugInput,
-                    String secondDrugInput) {
+                                   List<Drug> drugs,
+                                   String firstDrugInput,
+                                   String secondDrugInput) {
+
+        String idDrug1 = getConceptID(drugs, firstDrugInput);
+        String idDrug2 = getConceptID(drugs, secondDrugInput);
+
 
         System.out.println("==== Find overlap genes ==== ");
         System.out.println("Drug 1 input: " + firstDrugInput);
         System.out.println("Drug 2 input: " + secondDrugInput);
         System.out.println();
 
-
-//  concept id van opgegeven drugnaam ophalen
-        String idDrug1 = drugs.stream()
-                .filter(drug -> drug.drugClaimName().equalsIgnoreCase(firstDrugInput)) // gebruikt getter
-                .map(Drug::conceptId) // pakt concept id
-                .findFirst() // pakt eerste (en als t goed is enige) match
-                .orElseThrow(()-> new IllegalArgumentException("Drug not found: " + firstDrugInput));
-
-        String idDrug2 = drugs.stream()
-                .filter(drug -> drug.drugClaimName().equalsIgnoreCase(secondDrugInput)) // gebruikt getter
-                .map(Drug::conceptId) // pakt concept id
-                .findFirst() // pakt eerste (en als t goed is enige) match
-                .orElseThrow(()-> new IllegalArgumentException("Drug not found: " + secondDrugInput));
 
 // genen ophalen die drug beïnvloeden
         Set<String> genesDrug1 = interactions.stream()
@@ -79,8 +78,17 @@ public class InteractionChecker {
         System.out.println("-");
     }
 
-    public static void CompareInteractionTypes(String[] args) {
-        System.out.println("-");
-    }
-}
+    public static void CompareInteractionTypes(List<Interaction> interactions,
+                                               List<Drug> drugs,
+                                               String firstDrugInput,
+                                               String secondDrugInput) {
+
+//        interaction_type
+
+        String idDrug1 = getConceptID(drugs, firstDrugInput);
+        String idDrug2 = getConceptID(drugs, secondDrugInput);
+
+
+
+}}
 
