@@ -1,80 +1,80 @@
-drugtype_1	drugtype_2	resultaat
-activator	activator	Versterkend
-activator	agonist	Versterkend
-activator	antibody	meestal tegenwerkend
-activator	antisense oligonucleotide	Tegenwerkend
-activator	blocker	Tegenwerkend
-activator	cleavage	Tegenwerkend
+Drug Type 1	Drug Type 2	Result
+activator	activator	Enhancing
+activator	agonist	Enhancing
+activator	antibody	Mostly Opposing
+activator	antisense oligonucleotide	Opposing
+activator	blocker	Opposing
+activator	cleavage	Opposing
 activator	immunotherapy	Unknown
-activator	inhibitor	Tegenwerkend
-activator	inverse agonist	Tegenwerkend
+activator	inhibitor	Opposing
+activator	inverse agonist	Opposing
 activator	modulator	Unknown
-activator	negative modulator	Tegenwerkend
-activator	positive modulator	Versterkend
-activator	Potentiator	Versterkend
+activator	negative modulator	Opposing
+activator	positive modulator	Enhancing
+activator	Potentiator	Enhancing
 activator	vaccine	Unknown
 activator	binder	Unknown
-agonist	agonist	Versterkend
-agonist	antibody	meestal tegenwerkend
-agonist	antisense oligonucleotide	Tegenwerkend
-agonist	blocker	Tegenwerkend
-agonist	cleavage	Tegenwerkend
+agonist	agonist	Enhancing
+agonist	antibody	Mostly Opposing
+agonist	antisense oligonucleotide	Opposing
+agonist	blocker	Opposing
+agonist	cleavage	Opposing
 agonist	immunotherapy	Unknown
-agonist	inhibitor	Tegenwerkend
-agonist	inverse agonist	Tegenwerkend
+agonist	inhibitor	Opposing
+agonist	inverse agonist	Opposing
 agonist	modulator	Unknown
-agonist	negative modulator	Tegenwerkend
-agonist	positive modulator	Versterkend
-agonist	Potentiator	Versterkend
+agonist	negative modulator	Opposing
+agonist	positive modulator	Enhancing
+agonist	Potentiator	Enhancing
 agonist	vaccine	Unknown
 agonist	binder	Unknown
-antibody	antibody	Versterkend
-antibody	antisense oligonucleotide	Synergetisch
-antibody	blocker	Synergetisch
-antibody	cleavage	Synergetisch
+antibody	antibody	Enhancing
+antibody	antisense oligonucleotide	Synergistic
+antibody	blocker	Synergistic
+antibody	cleavage	Synergistic
 antibody	immunotherapy	Unknown
-antibody	inhibitor	Synergetisch
-antibody	inverse agonist	Synergetisch
-antibody	modulator	Tegenwerkend
-antibody	negative modulator	Tegenwerkend
-antibody	positive modulator	Tegenwerkend
-antibody	Potentiator	Tegenwerkend
+antibody	inhibitor	Synergistic
+antibody	inverse agonist	Synergistic
+antibody	modulator	Opposing
+antibody	negative modulator	Opposing
+antibody	positive modulator	Opposing
+antibody	Potentiator	Opposing
 antibody	vaccine	Unknown
 antibody	binder	Unknown
-antisense oligonucleotide	antisense oligonucleotide	Versterkend
-antisense oligonucleotide	blocker	Synergetisch
-antisense oligonucleotide	cleavage	Synergetisch
+antisense oligonucleotide	antisense oligonucleotide	Enhancing
+antisense oligonucleotide	blocker	Synergistic
+antisense oligonucleotide	cleavage	Synergistic
 antisense oligonucleotide	immunotherapy	Unknown
-antisense oligonucleotide	inhibitor	Synergetisch
-antisense oligonucleotide	inverse agonist	Synergetisch
+antisense oligonucleotide	inhibitor	Synergistic
+antisense oligonucleotide	inverse agonist	Synergistic
 antisense oligonucleotide	modulator	Unknown
-antisense oligonucleotide	negative modulator	Synergetisch
-antisense oligonucleotide	positive modulator	Tegenwerkend
-antisense oligonucleotide	Potentiator	Tegenwerkend
+antisense oligonucleotide	negative modulator	Synergistic
+antisense oligonucleotide	positive modulator	Opposing
+antisense oligonucleotide	Potentiator	Opposing
 antisense oligonucleotide	vaccine	Unknown
 antisense oligonucleotide	binder	Unknown
-blocker	blocker	Versterkend
-blocker	cleavage	Synergetisch
+blocker	blocker	Enhancing
+blocker	cleavage	Synergistic
 blocker	immunotherapy	Unknown
-blocker	inhibitor	Synergetisch
-blocker	inverse agonist	Synergetisch
+blocker	inhibitor	Synergistic
+blocker	inverse agonist	Synergistic
 blocker	modulator	Unknown
-blocker	negative modulator	Synergetisch
-blocker	positive modulator	Tegenwerkend
-blocker	Potentiator	Tegenwerkend
+blocker	negative modulator	Synergistic
+blocker	positive modulator	Opposing
+blocker	Potentiator	Opposing
 blocker	vaccine	Unknown
 blocker	binder	Unknown
-cleavage	cleavage	Versterkend
+cleavage	cleavage	Enhancing
 cleavage	immunotherapy	Unknown
-cleavage	inhibitor	Synergetisch
-cleavage	inverse agonist	Synergetisch
+cleavage	inhibitor	Synergistic
+cleavage	inverse agonist	Synergistic
 cleavage	modulator	Unknown
-cleavage	negative modulator	Synergetisch
-cleavage	positive modulator	Tegenwerkend
-cleavage	Potentiator	Tegenwerkend
+cleavage	negative modulator	Synergistic
+cleavage	positive modulator	Opposing
+cleavage	Potentiator	Opposing
 cleavage	vaccine	Unknown
 cleavage	binder	Unknown
-immunotherapy	immunotherapy	Versterkend
+immunotherapy	immunotherapy	Enhancing
 immunotherapy	inhibitor	Unknown
 immunotherapy	inverse agonist	Unknown
 immunotherapy	modulator	Unknown
@@ -83,39 +83,39 @@ immunotherapy	positive modulator	Unknown
 immunotherapy	Potentiator	Unknown
 immunotherapy	vaccine	Unknown
 immunotherapy	binder	Unknown
-inhibitor	inhibitor	Versterkend
-inhibitor	inverse agonist	Synergetisch
+inhibitor	inhibitor	Enhancing
+inhibitor	inverse agonist	Synergistic
 inhibitor	modulator	Unknown
-inhibitor	negative modulator	Synergetisch
-inhibitor	positive modulator	Tegenwerkend
-inhibitor	Potentiator	Tegenwerkend
+inhibitor	negative modulator	Synergistic
+inhibitor	positive modulator	Opposing
+inhibitor	Potentiator	Opposing
 inhibitor	vaccine	Unknown
 inhibitor	binder	Unknown
-inverse agonist	inverse agonist	Versterkend
+inverse agonist	inverse agonist	Enhancing
 inverse agonist	modulator	Unknown
-inverse agonist	negative modulator	Synergetisch
-inverse agonist	positive modulator	Tegenwerkend
-inverse agonist	Potentiator	Tegenwerkend
+inverse agonist	negative modulator	Synergistic
+inverse agonist	positive modulator	Opposing
+inverse agonist	Potentiator	Opposing
 inverse agonist	vaccine	Unknown
 inverse agonist	binder	Unknown
-modulator	modulator	Versterkend
-modulator	negative modulator	Tegenwerkend
+modulator	modulator	Enhancing
+modulator	negative modulator	Opposing
 modulator	positive modulator	Unknown
-modulator	Potentiator	Versterkend
+modulator	Potentiator	Enhancing
 modulator	vaccine	Unknown
 modulator	binder	Unknown
-negative modulator	negative modulator	Versterkend
-negative modulator	positive modulator	Tegenwerkend
-negative modulator	Potentiator	Tegenwerkend
+negative modulator	negative modulator	Enhancing
+negative modulator	positive modulator	Opposing
+negative modulator	Potentiator	Opposing
 negative modulator	vaccine	Unknown
 negative modulator	binder	Unknown
-positive modulator	positive modulator	Versterkend
-positive modulator	Potentiator	Versterkend
+positive modulator	positive modulator	Enhancing
+positive modulator	Potentiator	Enhancing
 positive modulator	vaccine	Unknown
 positive modulator	binder	Unknown
-Potentiator	Potentiator	Versterkend
+Potentiator	Potentiator	Enhancing
 Potentiator	vaccine	Unknown
 Potentiator	binder	Unknown
-vaccine	vaccine	Versterkend
+vaccine	vaccine	Enhancing
 vaccine	binder	Unknown
 binder	binder	Unknown
