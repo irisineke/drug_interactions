@@ -1,30 +1,91 @@
-## Drug Interactions
-This project uses two drug inputs and two file inputs (drug.tsv and interaction.tsv) and performs an assessment. The program then assesses whether these can be safely combined. The program does not offer binding medical advice, but rather indicative support to identify potential risks at an earlier stage.
+# Drug Interactions
 
-### Structure
-- io/Leesbestanden: reads the files and saves them temporaly
-- io/OutputGenerator: combines InteractionChecker obtained data into output
+This project uses two drug inputs and two data files (`interactions.tsv` and `drugs.tsv`) to perform an assessment. It evaluates whether two drugs can be safely combined based on known interactions. **Note:** This tool does not provide medical advice but offers indicative support to identify potential risks at an early stage.
 
-- logic/InteractionChecker: extracts the necessary information from the data
+## 📁 Project Structure
 
-- methods/Placeholder: creates custom data types from the columns in the data
+```
+src/main/java/nl/bioinf/
+│
+├── io/
+│   ├── ReadFiles          # Reads and processes input files
+│   ├── OutputGenerator    # Generates output based on analysis
+│
+├── logic/
+│   └── InteractionChecker # Extracts interaction data and determines outcomes
+│
+├── methods/
+│   └── (Data Models)      # Custom data types: Drug, Interaction, Combination
+│
+├── ArgumentParser         # Handles command-line input via Picocli
+└── Main                    # Entry point of the application
+```
 
-- ArgumentParser: manages the command line input
-- Main: runs everything
+## 🛠 Installation
 
+### ✅ Requirements
 
-### Installation
-#### Step 1:
-Download the data from the [drugbank site](https://dgidb.org/downloads).
-! Make sure that you have java version 25.
+* **Java 17 or higher** (Java 21+ recommended)
+* Access to drug interaction data from **DGIdb** or **DrugBank**
 
-#### Step 2:
-Clone the Repository: git@github.com:irisineke/drug_interactions.git.
+### 1️⃣ Download Data
 
+Get `.tsv` data files from: [https://dgidb.org/downloads](https://dgidb.org/downloads)
 
+### 2️⃣ Clone Repository
 
-### How to run the code:
-java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar -intF Path/To/interactions.tsv -drF Path/To/drugs.tsv -d1 first_drug_of_choice -d2 second_drug_of_choice -o Path/To/Output/file
+```bash
+git clone git@github.com:irisineke/drug_interactions.git
+cd drug_interactions
+```
 
-*Example commandline with arguments:*
-java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar -intF Path/To/interactions.tsv -drF Path/To/drugs.tsv -d1 clonidine -d2 Compro -o Path/To/Output/file.txt
+## ▶️ How to Run
+
+Build the JAR (if using Gradle or Maven), then run:
+
+```bash
+java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar \
+  -intF Path/To/interactions.tsv \
+  -drF Path/To/drugs.tsv \
+  -d1 First_Drug_Name \
+  -d2 Second_Drug_Name \
+  -o Path/To/output.txt
+```
+
+### 💻 Example
+
+```bash
+java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar \
+  -intF data/interactions.tsv \
+  -drF data/drugs.tsv \
+  -d1 clonidine \
+  -d2 Compro \
+  -o results/output.txt
+```
+
+## 🧪 Testing (JUnit 5)
+
+Tests focus on:
+
+* File validation (`fileNotEmptyCheck`)
+* CLI argument parsing (Picocli)
+* Data reading (ReadFiles)
+* Interaction logic (InteractionChecker)
+
+Run tests with:
+
+```bash
+./gradlew test
+```
+
+## ⚠️ Disclaimer
+
+This tool **does not provide medical advice**. It is intended for research and educational purposes only.
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+Feel free to contribute or open issues for improvements! 🚀
