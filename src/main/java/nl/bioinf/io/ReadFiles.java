@@ -142,4 +142,14 @@ public class ReadFiles {
                 "Required column '" + columnName + "' not found in file: " + file.getName()
         );
     }
+
+
+    private int indexOf(String[] headers, String name) {
+        for (int i = 0; i < headers.length; i++) {
+            if (headers[i].equals(name)) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Header not found: " + name);
+    }
 }
