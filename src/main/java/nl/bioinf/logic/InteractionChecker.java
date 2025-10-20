@@ -109,7 +109,13 @@ public class InteractionChecker {
                                               List<Drug> drugs,
                                               String firstDrugInput,
                                               String secondDrugInput,
-                                              List<Combination> combinations) {
+                                              List<Combination> combinations,
+                                              Set<String> overlap) {
+
+        if (overlap.isEmpty()) {
+            System.out.println("No gene overlap found; skipping combination result.");
+            return "not applicable";
+        }
 
         String[] types = getInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
         String typeDrug1 = types[0];
