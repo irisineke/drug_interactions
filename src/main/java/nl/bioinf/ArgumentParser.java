@@ -71,14 +71,15 @@ public class ArgumentParser implements Runnable {
 
 
             InteractionChecker checker = new InteractionChecker();
-            Set<String> overlap = checker.geneOverlap(interactions, drugs, firstDrugInput, secondDrugInput);
+            StringBuilder outputSB = new StringBuilder();
+            Set<String> overlap = checker.geneOverlap(interactions, drugs, firstDrugInput, secondDrugInput, outputSB);
             String[] type = checker.getInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
-            String combinationResult = checker.getCombinationResult(interactions, drugs, firstDrugInput, secondDrugInput, combinations, overlap);
+            String combinationResult = checker.getCombinationResult(interactions, drugs, firstDrugInput, secondDrugInput, combinations, overlap, outputSB);
 
 
 
             OutputGenerator generator = new OutputGenerator(output);
-            generator.generateOutput(overlap);
+            generator.generateOutput(outputSB);
 
 
         } catch (Exception e) {
