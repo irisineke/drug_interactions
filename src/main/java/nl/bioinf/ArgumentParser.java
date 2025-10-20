@@ -73,7 +73,7 @@ public class ArgumentParser implements Runnable {
             InteractionChecker checker = new InteractionChecker();
             Set<String> overlap = checker.geneOverlap(interactions, drugs, firstDrugInput, secondDrugInput);
             String[] type = checker.getInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
-            String combinationResult = checker.getCombinationResult(interactions, drugs, firstDrugInput, secondDrugInput, combinations);
+            String combinationResult = checker.getCombinationResult(interactions, drugs, firstDrugInput, secondDrugInput, combinations, overlap);
 
 
 
