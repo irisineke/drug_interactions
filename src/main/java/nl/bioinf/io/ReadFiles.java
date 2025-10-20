@@ -119,7 +119,7 @@ public class ReadFiles {
             String[] headers = lines.get(0).split("\t", -1);
             int idxType1 = indexOf(headers, "drugtype_1");
             int idxType2 = indexOf(headers, "drugtype_2");
-            int idxResult = indexOf(headers, "resultaat");
+            int idxResult = indexOf(headers, "result");
 
             List<Combination> result = new ArrayList<>();
             for (int i = 1; i < lines.size(); i++) {

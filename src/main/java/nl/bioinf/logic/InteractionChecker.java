@@ -23,16 +23,17 @@ public class InteractionChecker {
     public Set<String> geneOverlap(List<Interaction> interactions,
                                    List<Drug> drugs,
                                    String firstDrugInput,
-                                   String secondDrugInput) {
+                                   String secondDrugInput,
+                                   StringBuilder outputSB) {
 
         String idDrug1 = getConceptID(drugs, firstDrugInput);
         String idDrug2 = getConceptID(drugs, secondDrugInput);
 
 
-        System.out.println("==== Find overlap genes ==== ");
-        System.out.println("Drug 1 input: " + firstDrugInput);
-        System.out.println("Drug 2 input: " + secondDrugInput);
-        System.out.println(" ");
+        outputSB.append("==== Find overlap genes ==== \n");
+        outputSB.append("Drug 1 input: ").append(firstDrugInput).append("\n");
+        outputSB.append("Drug 2 input: ").append(secondDrugInput).append("\n\n");
+
 
 
 // genen ophalen die drug beïnvloeden
@@ -52,19 +53,20 @@ public class InteractionChecker {
             .collect(Collectors.toSet());
 
         // ! door translate gegooid, later ms correct engels maken
-        System.out.println("Number of genes influenced by " + firstDrugInput + ": " + genesDrug1.size());
-        System.out.println("Number of genes influenced by " + secondDrugInput + ": " + genesDrug2.size());
+        outputSB.append("Number of genes influenced by ").append(firstDrugInput).append( ": ").append(genesDrug1.size()).append("\n");
+        outputSB.append("Number of genes influenced by ").append(secondDrugInput).append(": ").append(genesDrug2.size()).append("\n\n");
 
 
         // printen overlap: wat als er geen overlap is, en else print alle overlap genen:
         if (overlap.isEmpty()){
-            System.out.println("No overlap found.");}
+            outputSB.append("No overlap found.");}
         else {
-            System.out.println("Number of overlapping genes: " + overlap.size());
-            System.out.println("Overlapping genes: ");
-            overlap.forEach(System.out::println); // print alle regels uit overlap
+            outputSB.append("Number of overlapping genes: ").append(overlap.size()).append("\n");
+            outputSB.append("Overlapping genes: ").append("\n");
+            overlap.forEach(gene ->outputSB.append(gene).append("\n")); // print alle regels uit overlap
         }
 
+        outputSB.append("\n");
         return overlap; // overlap teruggeven aan ArgumentParser
     }
 
@@ -110,21 +112,22 @@ public class InteractionChecker {
                                               String firstDrugInput,
                                               String secondDrugInput,
                                               List<Combination> combinations,
-                                              Set<String> overlap) {
+                                              Set<String> overlap,
+                                              StringBuilder outputSB) {
 
         if (overlap.isEmpty()) {
-            System.out.println("No gene overlap found; skipping combination result.");
-            return "not applicable";
+            outputSB.append("No gene overlap found; skipping combination result.").append("\n");
+            return "unknown";
         }
 
         String[] types = getInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
         String typeDrug1 = types[0];
         String typeDrug2 = types[1];
 
-        System.out.println("==== Find type drugs ==== ");
-        System.out.println(firstDrugInput + " type: " + typeDrug1);
-        System.out.println(secondDrugInput + " type: " + typeDrug2);
-        System.out.println();
+        outputSB.append("==== Find type drugs ==== ").append("\n");
+        outputSB.append(firstDrugInput).append(" type: ").append(typeDrug1).append("\n");
+        outputSB.append(secondDrugInput).append(" type: ").append(typeDrug2).append("\n\n");
+
 
         // stay with me:
         // zoekt naar de types in de drug_combination.tsv en geeft resultaat (kolom met combinatie resultaat) terug
@@ -133,16 +136,14 @@ public class InteractionChecker {
                     comb.drugType1().equalsIgnoreCase(typeDrug2) && comb.drugType2().equalsIgnoreCase(typeDrug1);
 
             if (match) {
-                System.out.println("==== Combination drugs Result ==== ");
-                System.out.println("Combination result: " + comb.resultaat());
-                System.out.println();
+                outputSB.append("==== Combination drugs Result ==== ").append("\n");
+                outputSB.append("Combination result: ").append(comb.resultaat()).append("\n\n");
                 return comb.resultaat();
             }
         }
 
-        System.out.println("==== Combination drugs Result ==== ");
-        System.out.println("Combination result is unknown");
-        System.out.println();
+        outputSB.append("==== Combination drugs Result ==== ").append("\n");
+        outputSB.append("Combination result is unknown").append("\n\n");
         return "Unknown";
         }
 }
