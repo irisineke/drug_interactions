@@ -1,0 +1,121 @@
+drugtype_1	drugtype_2	resultaat
+activator	activator	Versterkend
+activator	agonist	Versterkend (activator versterkt agonist)
+activator	antibody	meestal tegenwerkend (antibody blokkeert doelwit)
+activator	antisense oligonucleotide	Tegenwerkend (ASO vermindert expressie, dus minder target beschikbaar)
+activator	blocker	Tegenwerkend
+activator	cleavage	Tegenwerkend
+activator	immunotherapy	Unknown
+activator	inhibitor	Tegenwerkend (kan effect grotendeels opheffen)
+activator	inverse agonist	Tegenwerkend
+activator	modulator	Unknown
+activator	negative modulator	Tegenwerkend (verlaagt activator-effect)
+activator	positive modulator	Versterkend (versterkt activator-effect)
+activator	Potentiator	Versterkend (verhoogt activator-effect)
+activator	vaccine	Unknown
+activator	binder	Unknown
+agonist	agonist	Versterkend
+agonist	antibody	meestal tegenwerkend (antibody kan target blokkeren)
+agonist	antisense oligonucleotide	Tegenwerkend (ASO vermindert expressie, dus minder target beschikbaar)
+agonist	blocker	Tegenwerkend
+agonist	cleavage	Tegenwerkend
+agonist	immunotherapy	Unknown
+agonist	inhibitor	Tegenwerkend (kan effect grotendeels opheffen)
+agonist	inverse agonist	Tegenwerkend
+agonist	modulator	Unknown
+agonist	negative modulator	Tegenwerkend (modulator verlaagt agonist effect)
+agonist	positive modulator	Versterkend (modulator verhoogt agonist effect)
+agonist	Potentiator	Versterkend (verhoogt agonist-effect)
+agonist	vaccine	Unknown
+agonist	binder	Unknown
+antibody	antibody	Versterkend
+antibody	antisense oligonucleotide	Synergetisch (beide verminderen activiteit)
+antibody	blocker	Synergetisch
+antibody	cleavage	Synergetisch
+antibody	immunotherapy	Unknown
+antibody	inhibitor	Synergetisch (beide verminderen activiteit)
+antibody	inverse agonist	Synergetisch
+antibody	modulator	Tegenwerkend
+antibody	negative modulator	Tegenwerkend
+antibody	positive modulator	Tegenwerkend (antibody het target blokkeert)
+antibody	Potentiator	Tegenwerkend
+antibody	vaccine	Unknown
+antibody	binder	Unknown
+antisense oligonucleotide	antisense oligonucleotide	Versterkend
+antisense oligonucleotide	blocker	Synergetisch
+antisense oligonucleotide	cleavage	Synergetisch
+antisense oligonucleotide	immunotherapy	Unknown
+antisense oligonucleotide	inhibitor	Synergetisch (beide verminderen activiteit)
+antisense oligonucleotide	inverse agonist	Synergetisch
+antisense oligonucleotide	modulator	Unknown
+antisense oligonucleotide	negative modulator	Synergetisch
+antisense oligonucleotide	positive modulator	Tegenwerkend (ASO blokkeert gen, target-activiteit verlaagd)
+antisense oligonucleotide	Potentiator	Tegenwerkend (ASO blokkeert target)
+antisense oligonucleotide	vaccine	Unknown
+antisense oligonucleotide	binder	Unknown
+blocker	blocker	Versterkend
+blocker	cleavage	Synergetisch
+blocker	immunotherapy	Unknown
+blocker	inhibitor	Synergetisch
+blocker	inverse agonist	Synergetisch
+blocker	modulator	Unknown
+blocker	negative modulator	Synergetisch
+blocker	positive modulator	Tegenwerkend
+blocker	Potentiator	Tegenwerkend
+blocker	vaccine	Unknown
+blocker	binder	Unknown
+cleavage	cleavage	Versterkend
+cleavage	immunotherapy	Unknown
+cleavage	inhibitor	Synergetisch
+cleavage	inverse agonist	Synergetisch
+cleavage	modulator	Unknown
+cleavage	negative modulator	Synergetisch
+cleavage	positive modulator	Tegenwerkend
+cleavage	Potentiator	Tegenwerkend
+cleavage	vaccine	Unknown
+cleavage	binder	Unknown
+immunotherapy	immunotherapy	Versterkend
+immunotherapy	inhibitor	Unknown
+immunotherapy	inverse agonist	Unknown
+immunotherapy	modulator	Unknown
+immunotherapy	negative modulator	Unknown
+immunotherapy	positive modulator	Unknown
+immunotherapy	Potentiator	Unknown
+immunotherapy	vaccine	Unknown
+immunotherapy	binder	Unknown
+inhibitor	inhibitor	Versterkend
+inhibitor	inverse agonist	Synergetisch
+inhibitor	modulator	Unknown
+inhibitor	negative modulator	Synergetisch (beide verminderen activiteit)
+inhibitor	positive modulator	Tegenwerkend (remming wordt verzwakt)
+inhibitor	Potentiator	Tegenwerkend
+inhibitor	vaccine	Unknown
+inhibitor	binder	Unknown
+inverse agonist	inverse agonist	Versterkend
+inverse agonist	modulator	Unknown
+inverse agonist	negative modulator	Synergetisch
+inverse agonist	positive modulator	Tegenwerkend
+inverse agonist	Potentiator	Tegenwerkend
+inverse agonist	vaccine	Unknown
+inverse agonist	binder	Unknown
+modulator	modulator	Versterkend
+modulator	negative modulator	Tegenwerkend
+modulator	positive modulator	Unknown
+modulator	Potentiator	Versterkend
+modulator	vaccine	Unknown
+modulator	binder	Unknown
+negative modulator	negative modulator	Versterkend
+negative modulator	positive modulator	Tegenwerkend (kan elkaar deels opheffen)
+negative modulator	Potentiator	Tegenwerkend
+negative modulator	vaccine	Unknown
+negative modulator	binder	Unknown
+positive modulator	positive modulator	Versterkend
+positive modulator	Potentiator	Versterkend (activiteit wordt verhoogd)
+positive modulator	vaccine	Unknown
+positive modulator	binder	Unknown
+Potentiator	Potentiator	Versterkend
+Potentiator	vaccine	Unknown
+Potentiator	binder	Unknown
+vaccine	vaccine	Versterkend
+vaccine	binder	Unknown
+binder	binder	Unknown

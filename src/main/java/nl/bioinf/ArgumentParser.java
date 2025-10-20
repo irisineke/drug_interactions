@@ -1,6 +1,6 @@
 package nl.bioinf;
 
-import nl.bioinf.io.ReadFiles;
+import nl.bioinf.io.*;
 import nl.bioinf.io.OutputGenerator;
 import nl.bioinf.logic.InteractionChecker;
 import picocli.CommandLine.*;
@@ -11,6 +11,7 @@ import java.util.Set;
 
 import nl.bioinf.methods.Interaction;
 import nl.bioinf.methods.Drug;
+import nl.bioinf.methods.Combination;
 
 
 
@@ -66,9 +67,14 @@ public class ArgumentParser implements Runnable {
             ReadFiles lb = new ReadFiles(interactionsFile, drugsFile);
             List<Interaction> interactions = lb.processInteractions();
             List<Drug> drugs = lb.processDrugs();
+            List<Combination> combinations = lb.processCombinations();
+
 
             InteractionChecker checker = new InteractionChecker();
             Set<String> overlap = checker.geneOverlap(interactions, drugs, firstDrugInput, secondDrugInput);
+            String[] type = checker.getInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
+            String combinationResult = checker.getCombinationResult(interactions, drugs, firstDrugInput, secondDrugInput, combinations);
+
 
 
             OutputGenerator generator = new OutputGenerator(output);
@@ -121,4 +127,9 @@ public class ArgumentParser implements Runnable {
 // ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 clonidine -d2 Compro -o /Users/irisineke/Downloads/test_overlap.txt'
 // voor checken geen overlap:
 // ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 Savella -d2 Acthar -o /Users/irisineke/Downloads/test_overlap.txt'
+
+// voor checken combinaties:
+// ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 clonidine -d2 dicyclomine -o /Users/irisineke/Downloads/test_overlap.txt'
+// voor checken geen resultaat (door null of unknown):
+// ./gradlew run --args='-intF data/raw/interactions.tsv -drF data/raw/drugs.tsv -d1 clonidine -d2 Compro -o /Users/irisineke/Downloads/test_overlap.txt'
 

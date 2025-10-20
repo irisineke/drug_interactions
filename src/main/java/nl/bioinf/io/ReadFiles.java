@@ -1,5 +1,6 @@
 package nl.bioinf.io;
 
+import nl.bioinf.methods.Combination;
 import nl.bioinf.methods.Drug;
 import nl.bioinf.methods.Interaction;
 
@@ -10,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReadFiles {
-
     private final File interactionsFile;
     private final File drugsFile;
+    private final File combinationsFile = new File("data/drug_combinations.tsv");
 
     public ReadFiles(File interactionsFile, File drugsFile) {
         this.interactionsFile = interactionsFile;
@@ -25,6 +26,10 @@ public class ReadFiles {
 
     public List<Drug> processDrugs() {
         return readDrugs(drugsFile);
+    }
+
+    public List<Combination> processCombinations() {
+        return readCombinations(combinationsFile);
     }
 
     private List<Interaction> readInteractions(File file) {
@@ -106,11 +111,27 @@ public class ReadFiles {
         return result;
     }
 
-    private int indexOf(String[] headers, String name) {
-        for (int i = 0; i < headers.length; i++) {
-            if (headers[i].equals(name)) return i;
+    private List<Combination> readCombinations(File file) {
+        try {
+            List<String> lines = Files.readAllLines(file.toPath());
+            if (lines.isEmpty()) return List.of();
+
+            String[] headers = lines.get(0).split("\t", -1);
+            int idxType1 = indexOf(headers, "drugtype_1");
+            int idxType2 = indexOf(headers, "drugtype_2");
+            int idxResult = indexOf(headers, "resultaat");
+
+            List<Combination> result = new ArrayList<>();
+            for (int i = 1; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.isBlank()) continue;
+                String[] parts = line.split("\t", -1);
+                result.add(new Combination(parts[idxType1], parts[idxType2], parts[idxResult]));
+            }
+            return result;
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading file: " + file, e);
         }
-        throw new IllegalArgumentException("Header not found: " + name);
     }
 
     private void assertColumnExists(String[] headers, String columnName, File file) {
