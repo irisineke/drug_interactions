@@ -61,14 +61,13 @@ public class ReadFiles {
         return headers;
     }
 
-
+    /** Vind header-index; gooit duidelijke foutmelding met bestandsnaam. */
     private int indexOf(String[] headers, String name, File file) {
         for (int i = 0; i < headers.length; i++) {
-            if (headers[i].equals(name)) return i; // exact match; desnoods .equalsIgnoreCase
+            if (headers[i].equals(name)) return i; // evt. equalsIgnoreCase
         }
         throw new IllegalArgumentException("Header not found: '" + name + "' in file: " + file.getAbsolutePath());
     }
-
 
     private List<Interaction> readInteractions(File file) {
         validateInputFile(file, "Interactions file");
@@ -77,10 +76,10 @@ public class ReadFiles {
             if (lines.isEmpty()) return List.of();
 
             String[] headers = normalizeHeaders(lines.getFirst());
-            int idxGene  = indexOf(headers, "gene_claim_name",    file);
-            int idxType  = indexOf(headers, "interaction_type",   file);
-            int idxScore = indexOf(headers, "interaction_score",  file);
-            int idxDrug  = indexOf(headers, "drug_concept_id",    file);
+            int idxGene  = indexOf(headers, "gene_claim_name",   file);
+            int idxType  = indexOf(headers, "interaction_type",  file);
+            int idxScore = indexOf(headers, "interaction_score", file);
+            int idxDrug  = indexOf(headers, "drug_concept_id",   file);
 
             int maxIdx = Math.max(Math.max(idxGene, idxType), Math.max(idxScore, idxDrug));
 
@@ -143,10 +142,13 @@ public class ReadFiles {
             List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
             if (lines.isEmpty()) return List.of();
 
-            String[] headers = lines.get(0).split("\t", -1);
-            int idxType1 = indexOf(headers, "drugtype_1");
-            int idxType2 = indexOf(headers, "drugtype_2");
-            int idxResult = indexOf(headers, "result");
+            String[] headers = normalizeHeaders(lines.getFirst());
+            // Let op: gebruik hier dezelfde header-namen als in je TSV (je noemde eerder 'resultaat')
+            int idxType1  = indexOf(headers, "drugtype_1", file);
+            int idxType2  = indexOf(headers, "drugtype_2", file);
+            int idxResult = indexOf(headers, "result",  file);
+
+            int maxIdx = Math.max(idxResult, Math.max(idxType1, idxType2));
 
             List<Combination> result = new ArrayList<>();
             for (int i = 1; i < lines.size(); i++) {
@@ -165,23 +167,5 @@ public class ReadFiles {
             throw new RuntimeException("Error reading file: " + file.getAbsolutePath(), e);
         }
     }
-
-    private void assertColumnExists(String[] headers, String columnName, File file) {
-        for (String header : headers) {
-            if (header.equals(columnName)) return;
-        }
-        throw new IllegalArgumentException(
-                "Required column '" + columnName + "' not found in file: " + file.getName()
-        );
-    }
-
-
-    private int indexOf(String[] headers, String name) {
-        for (int i = 0; i < headers.length; i++) {
-            if (headers[i].equals(name)) {
-                return i;
-            }
-        }
-        throw new IllegalArgumentException("Header not found: " + name);
-    }
 }
+
