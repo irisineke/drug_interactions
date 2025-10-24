@@ -143,12 +143,10 @@ public class ReadFiles {
             List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
             if (lines.isEmpty()) return List.of();
 
-            String[] headers = normalizeHeaders(lines.getFirst());
-            int idxType1  = indexOf(headers, "drugtype_1", file);
-            int idxType2  = indexOf(headers, "drugtype_2", file);
-            int idxResult = indexOf(headers, "resultaat",  file);
-
-            int maxIdx = Math.max(idxResult, Math.max(idxType1, idxType2));
+            String[] headers = lines.get(0).split("\t", -1);
+            int idxType1 = indexOf(headers, "drugtype_1");
+            int idxType2 = indexOf(headers, "drugtype_2");
+            int idxResult = indexOf(headers, "result");
 
             List<Combination> result = new ArrayList<>();
             for (int i = 1; i < lines.size(); i++) {
@@ -167,5 +165,23 @@ public class ReadFiles {
             throw new RuntimeException("Error reading file: " + file.getAbsolutePath(), e);
         }
     }
-}
 
+    private void assertColumnExists(String[] headers, String columnName, File file) {
+        for (String header : headers) {
+            if (header.equals(columnName)) return;
+        }
+        throw new IllegalArgumentException(
+                "Required column '" + columnName + "' not found in file: " + file.getName()
+        );
+    }
+
+
+    private int indexOf(String[] headers, String name) {
+        for (int i = 0; i < headers.length; i++) {
+            if (headers[i].equals(name)) {
+                return i;
+            }
+        }
+        throw new IllegalArgumentException("Header not found: " + name);
+    }
+}
