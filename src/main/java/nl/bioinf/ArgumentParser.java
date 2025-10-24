@@ -69,6 +69,7 @@ public class ArgumentParser implements Runnable {
             List<Drug> drugs = lb.processDrugs();
             List<Combination> combinations = lb.processCombinations();
 
+            Validate.validateOutputPath(output);
 
             InteractionChecker checker = new InteractionChecker();
             StringBuilder outputSB = new StringBuilder();
@@ -107,6 +108,7 @@ public class ArgumentParser implements Runnable {
         if (file.length() == 0) {
             throw new IllegalArgumentException("❌ ERROR: " + name + " is empty :(");
         }
+
     }
 }
 

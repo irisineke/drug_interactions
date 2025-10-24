@@ -72,7 +72,6 @@ class ArgumentParserTest {
         Files.writeString(drugs, "x\n");
         Path out = tempDir.resolve("out.txt");
 
-        // Parse alleen de opties naar het object (NIET runnen!)
         ArgumentParser ap = new ArgumentParser();
         String[] args = new String[] {
                 "-intF", interactions.toString(),
