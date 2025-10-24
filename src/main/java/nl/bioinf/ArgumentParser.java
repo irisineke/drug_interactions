@@ -69,6 +69,7 @@ public class ArgumentParser implements Runnable {
             List<Drug> drugs = lb.processDrugs();
             List<Combination> combinations = lb.processCombinations();
 
+            Validate.validateOutputPath(output);
 
             InteractionChecker checker = new InteractionChecker();
             Set<String> overlap = checker.geneOverlap(interactions, drugs, firstDrugInput, secondDrugInput);
@@ -106,6 +107,7 @@ public class ArgumentParser implements Runnable {
         if (file.length() == 0) {
             throw new IllegalArgumentException("❌ ERROR: " + name + " is empty :(");
         }
+
     }
 }
 
