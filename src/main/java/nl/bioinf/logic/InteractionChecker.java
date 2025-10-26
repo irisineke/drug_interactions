@@ -101,7 +101,7 @@ public class InteractionChecker {
                                               List<Combination> combinations,
                                               Set<String> overlap,
                                               StringBuilder outputSB) {
-        outputSB.append("==== Combination drugs Result ==== \n");
+        outputSB.append("==== Combination drugs ==== \n");
         if (overlap.isEmpty()) {
             outputSB.append("No gene overlap found; skipping combination result.").append("\n\n");
             return "unknown";
