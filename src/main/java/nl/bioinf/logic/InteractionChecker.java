@@ -184,14 +184,6 @@ public class InteractionChecker {
         outputSB.append("\n");
 
 return results;
-
-
-//        // scores naar output schrijven
-//        outputSB.append("==== Combination drugs Result ==== \n");
-//        outputSB.append(firstDrugInput).append("score: ").append(scoreDrug1).append("\n");
-//        outputSB.append(secondDrugInput).append("score: ").append(scoreDrug2).append("\n\n");
-
-        // beide in list zetten om te returnen:
     }
 }
 
