@@ -135,11 +135,11 @@ public class InteractionChecker {
 
 
     public static List<String> GetInteractionScorePerGene(List<Interaction> interactions,
-                                                  List<Drug> drugs,
-                                                  String firstDrugInput,
-                                                  String secondDrugInput,
+                                                          List<Drug> drugs,
+                                                          String firstDrugInput,
+                                                          String secondDrugInput,
                                                           Set<String> overlap,
-                                                  StringBuilder outputSB) {
+                                                          StringBuilder outputSB) {
 
         String idDrug1 = getConceptID(drugs, firstDrugInput);
         String idDrug2 = getConceptID(drugs, secondDrugInput);
@@ -152,7 +152,7 @@ public class InteractionChecker {
                 .filter(interaction -> interaction.drugConceptId().equals(idDrug1))
                 .collect(Collectors.toMap(
                         Interaction::geneClaimName,
-                        interaction ->Float.parseFloat(interaction.interactionScore()),
+                        interaction -> Float.parseFloat(interaction.interactionScore()),
                         (a, b) -> a)); // als gen vaker voorkomt houdt hij eerste score, ! later veranderen ?
 
 
@@ -161,7 +161,7 @@ public class InteractionChecker {
                 .filter(interaction -> interaction.drugConceptId().equals(idDrug2))
                 .collect(Collectors.toMap(
                         Interaction::geneClaimName,
-                        interaction ->Float.parseFloat(interaction.interactionScore()),
+                        interaction -> Float.parseFloat(interaction.interactionScore()),
                         (a, b) -> a)); // als gen vaker voorkomt houdt hij eerste score, ! later veranderen ?
 
 
@@ -169,7 +169,7 @@ public class InteractionChecker {
         List<String> results = overlap.stream()
                 .filter(gene -> scoreDrug1.containsKey(gene) && scoreDrug2.containsKey(gene)) // houdt genen die in beide mappen zitten
                 .map(gene -> { // voor elke gen pakt ie scores van drug 1/2 en maakt er string van
-                    float score1 =scoreDrug1.get(gene);
+                    float score1 = scoreDrug1.get(gene);
                     float score2 = scoreDrug2.get(gene);
                     return gene + ": " + firstDrugInput + " = " + score1 + ", " + secondDrugInput + " = " + score2;
                 })
@@ -183,11 +183,58 @@ public class InteractionChecker {
         }
         outputSB.append("\n");
 
-return results;
+        return results;
+    }
+
+
+    // enum met: enhancing(+), oppsosing(-), unknown(+ en -), synergetisch(+, extra text)
+    enum CombinationTypes {
+        ENHANCING,
+        OPPOSING,
+        SYNERGETISCH,
+        UNKNOWN
+    }
+
+    public class EnumTest {
+        CombinationTypes combinationTypes;
+    }
+
+    public static String GetMathValue {
+        switch (combinationResult) {
+            case ENHANCING:
+                System.out.println("+");
+                break;
+
+            case OPPOSING:
+                System.out.println("-");
+
+            case SYNERGETISCH:
+                System.out.println("+");
+
+            case UNKNOWN:
+                System.out.println("Unknown");
+        }
+
+    }
+    public static String CompareInteractionScore(List<Interaction> interactions,
+                                               List<Drug> drugs,
+                                               String firstDrugInput,
+                                               String secondDrugInput,
+                                               List<Combination> combinations,
+                                               Set<String> overlap,
+                                               StringBuilder outputSB) {
+
+        String combinationResult = getCombinationResult(interactions,
+                            drugs,
+                            firstDrugInput,
+                            secondDrugInput,
+                            combinations,
+                            overlap,
+                            outputSB);
+
+
+
+        System.out.println("combinationresult: " + combinationResult);
+        return "unknown";
     }
 }
-
-//
-//public static void CompareInteractionScore(String[] args) {
-//  System.out.println("-");
-//}
