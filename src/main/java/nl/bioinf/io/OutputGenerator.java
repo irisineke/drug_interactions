@@ -39,4 +39,5 @@ public class OutputGenerator {
             throw new RuntimeException("Error in writing output overlap genes to: " + output, e); // later e wegghalen
         }
     }
+
 }

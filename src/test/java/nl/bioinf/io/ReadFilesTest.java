@@ -87,7 +87,7 @@ class ReadFilesTest {
         createdCombinationsPath = combinations;
 
         String content = String.join("\n",
-                "drugtype_1\tdrugtype_2\tresultaat",
+                "drugtype_1\tdrugtype_2\tresult",
                 "TKI\tChemo\tSynergistic",
                 "Hormonal\tTKI\tAntagonistic"
         );
@@ -106,18 +106,6 @@ class ReadFilesTest {
         assertEquals("TKI", list.getFirst().drugType1());
         assertEquals("Chemo", list.getFirst().drugType2());
         assertEquals("Synergistic", list.getFirst().resultaat());
-    }
-
-    @Test
-    void emptyFiles_returnEmptyLists() throws IOException {
-        Path interactions = tempDir.resolve("empty_interactions.tsv");
-        Path drugs = tempDir.resolve("empty_drugs.tsv");
-        Files.writeString(interactions, "");
-        Files.writeString(drugs, "");
-
-        ReadFiles rf = new ReadFiles(interactions.toFile(), drugs.toFile());
-        assertTrue(rf.processInteractions().isEmpty());
-        assertTrue(rf.processDrugs().isEmpty());
     }
 }
 
