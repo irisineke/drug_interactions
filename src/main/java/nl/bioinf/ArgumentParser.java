@@ -9,9 +9,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-import nl.bioinf.methods.Interaction;
-import nl.bioinf.methods.Drug;
-import nl.bioinf.methods.Combination;
+import nl.bioinf.models.Interaction;
+import nl.bioinf.models.Drug;
+import nl.bioinf.models.Combination;
 
 
 
