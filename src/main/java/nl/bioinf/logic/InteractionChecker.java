@@ -3,6 +3,7 @@ package nl.bioinf.logic;
 import nl.bioinf.methods.Combination;
 import nl.bioinf.methods.Drug;
 import nl.bioinf.methods.Interaction;
+import nl.bioinf.io.CombinationScoreEffect;
 
 import java.util.List;
 import java.util.Set;
@@ -111,7 +112,7 @@ public class InteractionChecker {
         String typeDrug1 = types[0];
         String typeDrug2 = types[1];
 
-        outputSB.append("==== Find type drugs ==== \n");
+        outputSB.append("== Find type drugs == \n");
         outputSB.append(firstDrugInput).append(" type: ").append(typeDrug1).append("\n");
         outputSB.append(secondDrugInput).append(" type: ").append(typeDrug2).append("\n\n");
 
@@ -145,7 +146,7 @@ public class InteractionChecker {
         String idDrug2 = getConceptID(drugs, secondDrugInput);
         System.out.println(firstDrugInput);
 
-        outputSB.append("=== Interaction scores per overlap genes ===\n");
+        outputSB.append("==== Interaction scores per overlap genes ====\n");
 
         // scores ophalen first drug en maakt daarvan een map<gene,score>
         var scoreDrug1 = interactions.stream()
@@ -187,54 +188,28 @@ public class InteractionChecker {
     }
 
 
-    // enum met: enhancing(+), oppsosing(-), unknown(+ en -), synergetisch(+, extra text)
-    enum CombinationTypes {
-        ENHANCING,
-        OPPOSING,
-        SYNERGETISCH,
-        UNKNOWN
-    }
 
-    public class EnumTest {
-        CombinationTypes combinationTypes;
-    }
 
-    public static String GetMathValue {
-        switch (combinationResult) {
-            case ENHANCING:
-                System.out.println("+");
-                break;
-
-            case OPPOSING:
-                System.out.println("-");
-
-            case SYNERGETISCH:
-                System.out.println("+");
-
-            case UNKNOWN:
-                System.out.println("Unknown");
-        }
-
-    }
     public static String CompareInteractionScore(List<Interaction> interactions,
                                                List<Drug> drugs,
                                                String firstDrugInput,
                                                String secondDrugInput,
                                                List<Combination> combinations,
                                                Set<String> overlap,
+                                               String combinationResult,
                                                StringBuilder outputSB) {
 
-        String combinationResult = getCombinationResult(interactions,
-                            drugs,
-                            firstDrugInput,
-                            secondDrugInput,
-                            combinations,
-                            overlap,
-                            outputSB);
+//        String combinationResult = getCombinationResult(interactions, drugs, firstDrugInput, secondDrugInput, combinations, overlap, outputSB);
+
+        CombinationScoreEffect effectSymbol = CombinationScoreEffect.fromResult(combinationResult);
+
+        outputSB.append("==== Calculating combined interaction scores ====\n");
+        outputSB.append("Combination type: ").append(combinationResult);
+        // tijdelijk:
+        outputSB.append("\nSymbol: ").append(effectSymbol.GetSymbol()).append("\n\n");
 
 
-
-        System.out.println("combinationresult: " + combinationResult);
         return "unknown";
     }
+
 }

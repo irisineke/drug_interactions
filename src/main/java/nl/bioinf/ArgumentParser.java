@@ -77,7 +77,7 @@ public class ArgumentParser implements Runnable {
             String[] type = checker.getInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
             String combinationResult = checker.getCombinationResult(interactions, drugs, firstDrugInput, secondDrugInput, combinations, overlap, outputSB);
             List<String> GetInteractionScore = checker.GetInteractionScorePerGene(interactions, drugs, firstDrugInput, secondDrugInput, overlap, outputSB);
-            String getinteractionScore = checker.CompareInteractionScore(interactions, drugs, firstDrugInput, secondDrugInput, combinations, overlap, outputSB);
+            String getinteractionScore = checker.CompareInteractionScore(interactions, drugs, firstDrugInput, secondDrugInput, combinations, overlap, combinationResult, outputSB);
 
             OutputGenerator generator = new OutputGenerator(output);
             generator.generateOutput(outputSB);
