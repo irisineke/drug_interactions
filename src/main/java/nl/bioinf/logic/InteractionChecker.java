@@ -198,11 +198,6 @@ public class InteractionChecker {
         }
         CombinationScoreEffect effectSymbol = CombinationScoreEffect.fromResult(combinationResult);
 
-        // temporary print:
-        outputSB.append("Combination type: ").append(combinationResult);
-        outputSB.append("\nSymbol: ").append(effectSymbol.GetSymbol())
-                .append("\n");
-
 
         List<String> combinedResults = geneScores.stream()
                 .map(genescore -> {
@@ -231,8 +226,39 @@ public class InteractionChecker {
                 })
                 .toList();
 
+//        text explanation per gene:
+        List<String> explanationLines = geneScores.stream()
+                .map(genescore -> {
+                    float combinedScore;
+                    switch (effectSymbol) {
+                        case ENHANCING -> {
+                            float combined = genescore.scoreDrug1() + genescore.scoreDrug2();
+                            return "The activity of " + genescore.gene() + " is increased by " + combined + ".";
+                        }
+                        case OPPOSING -> {
+                            float combined = genescore.scoreDrug1() - genescore.scoreDrug2();
+                            return "The activity of " + genescore.gene() + " is decreased by " + combined + ".";
+                        }
+                        case SYNERGETISCH -> {
+                            float combined = genescore.scoreDrug1() + genescore.scoreDrug2();
+                            return "The activity of " + genescore.gene() + " is increased by more than" + combined + ".";
+                        }
+                        case UNKNOWN -> {
+                            float plus = genescore.scoreDrug1() + genescore.scoreDrug2();
+                            float minus = genescore.scoreDrug1() - genescore.scoreDrug2();
+                            return "The activity of " + genescore.gene() + " is increased by " + plus + " or decreased by " + minus + ".";
+
+                        }
+                    }
+                    return "something went wrong";
+                })
+                .toList();
+
 
         combinedResults.forEach(line -> outputSB.append(line).append("\n"));
+        outputSB.append("\n");
+        outputSB.append("==== Calculation Results ==== \n");
+        explanationLines.forEach(line -> outputSB.append(line).append("\n"));
         return "done";
     }
 }
