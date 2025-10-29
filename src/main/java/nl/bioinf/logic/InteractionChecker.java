@@ -8,15 +8,15 @@ import nl.bioinf.io.CombinationScoreEffect;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 public class InteractionChecker {
 
     private static String getConceptID(List<Drug> drugs, String drugInput) {
         return drugs.stream()
                 .filter(drug -> drug.drugClaimName().equalsIgnoreCase(drugInput)) // gebruikt getter
-                .map(Drug::conceptId) // pakt concept id
-                .findFirst() // pakt eerste (en als t goed is enige) match
+                .map(Drug::conceptId)
+                .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Drug not found: " + drugInput));
     }
 
@@ -35,28 +35,26 @@ public class InteractionChecker {
         outputSB.append("Drug 2 input: ").append(secondDrugInput).append("\n\n");
 
 
-// genen ophalen die drug beïnvloeden
+// get genes that influence the drugs:
         Set<String> genesDrug1 = interactions.stream()
                 .filter(interaction -> interaction.drugConceptId().equals(idDrug1))
                 .map(Interaction::geneClaimName)
-                .collect(Collectors.toSet()); // bewaart in set
+                .collect(Collectors.toSet());
 
         Set<String> genesDrug2 = interactions.stream()
                 .filter(interaction -> interaction.drugConceptId().equals(idDrug2))
                 .map(Interaction::geneClaimName)
-                .collect(Collectors.toSet()); // bewaart in set
+                .collect(Collectors.toSet());
 
-// Overlap tussen genen vinden
+// find overlap between drugs:
         Set<String> overlap = genesDrug1.stream() // eerste alle genen van drug1 pakken
                 .filter(genesDrug2::contains) // bewaar alleen die die ook in drug 2 voorkomen
                 .collect(Collectors.toSet());
 
-        // ! door translate gegooid, later ms correct engels maken
         outputSB.append("Number of genes influenced by ").append(firstDrugInput).append(": ").append(genesDrug1.size()).append("\n");
         outputSB.append("Number of genes influenced by ").append(secondDrugInput).append(": ").append(genesDrug2.size()).append("\n\n");
 
 
-        // printen overlap: wat als er geen overlap is, en else print alle overlap genen:
         if (overlap.isEmpty()) {
             outputSB.append("No overlap found.\n");
         } else {
@@ -66,7 +64,7 @@ public class InteractionChecker {
         }
 
         outputSB.append("\n");
-        return overlap; // overlap teruggeven aan ArgumentParser
+        return overlap;
     }
 
 
@@ -78,7 +76,7 @@ public class InteractionChecker {
         String idDrug1 = getConceptID(drugs, firstDrugInput);
         String idDrug2 = getConceptID(drugs, secondDrugInput);
 
-        // interaction_type ophalen van drug (niet volgorde influenced)
+
         String typeDrug1 = interactions.stream()
                 .filter(interaction -> interaction.drugConceptId().equals(idDrug1))
                 .map(Interaction::interactionType)
@@ -113,13 +111,11 @@ public class InteractionChecker {
         String typeDrug1 = types[0];
         String typeDrug2 = types[1];
 
-        outputSB.append("== Find type drugs == \n");
         outputSB.append(firstDrugInput).append(" type: ").append(typeDrug1).append("\n");
         outputSB.append(secondDrugInput).append(" type: ").append(typeDrug2).append("\n\n");
 
 
-        // stay with me:
-        // zoekt naar de types in de drug_combination.tsv en geeft resultaat (kolom met combinatie resultaat) terug
+        // searches the types in the drug_combination.tsv and returns the result (column with combination result)
         for (Combination comb : combinations) {
             boolean match = comb.drugType1().equalsIgnoreCase(typeDrug1) && comb.drugType2().equalsIgnoreCase(typeDrug2) ||
                     comb.drugType1().equalsIgnoreCase(typeDrug2) && comb.drugType2().equalsIgnoreCase(typeDrug1);
@@ -130,7 +126,7 @@ public class InteractionChecker {
             }
         }
 
-        outputSB.append("==== Combination drugs Result ==== \n");
+
         outputSB.append("Combination result is unknown").append("\n\n");
         return "Unknown";
     }
@@ -150,25 +146,23 @@ public class InteractionChecker {
 
         outputSB.append("==== Interaction scores per overlap genes ====\n");
 
-        // scores ophalen first drug en maakt daarvan een map<gene,score>
+        // retrieve scores for the first drug and creates a map<gene,score>
         var scoreDrug1 = interactions.stream()
                 .filter(interaction -> interaction.drugConceptId().equals(idDrug1))
                 .collect(Collectors.toMap(
                         Interaction::geneClaimName,
                         interaction -> Float.parseFloat(interaction.interactionScore()),
-                        (a, b) -> a)); // als gen vaker voorkomt houdt hij eerste score, ! later veranderen ?
+                        (a, b) -> a)); // if gene occurs more often it keeps first score
 
 
-        // scores ophalen second drug
         var scoreDrug2 = interactions.stream()
                 .filter(interaction -> interaction.drugConceptId().equals(idDrug2))
                 .collect(Collectors.toMap(
                         Interaction::geneClaimName,
                         interaction -> Float.parseFloat(interaction.interactionScore()),
-                        (a, b) -> a)); // als gen vaker voorkomt houdt hij eerste score, ! later veranderen ?
+                        (a, b) -> a));
 
 
-        // door overlappende genen loopen
         List<GeneScore> geneScores = overlap.stream()
                 .filter(gene -> scoreDrug1.containsKey(gene) && scoreDrug2.containsKey(gene)) // houdt genen die in beide mappen zitten
                 // voor elke gen pakt ie scores van drug 1/2 en maakt er map van
@@ -177,43 +171,68 @@ public class InteractionChecker {
 
 
         if (geneScores.isEmpty()) {
-            outputSB.append("No overlapping genes with scores found.\n");
+            outputSB.append("No overlapping genes with scores found.\n\n");
         } else {
             outputSB.append("gene: first drug = first drug score, second drug = second drug score\n\n");
             geneScores.forEach(geneScore -> outputSB.append(geneScore.gene())
                     .append("; ").append(firstDrugInput).append(" = ").append(geneScore.scoreDrug1())
-                    .append("; ").append(secondDrugInput).append(" = ").append(geneScore.scoreDrug2()).append("\n"));
+                    .append("; ").append(secondDrugInput).append(" = ").append(geneScore.scoreDrug2())
+                    .append("\n"));
         }
-        outputSB.append("\n");
-
+    outputSB.append("\n");
         return geneScores;
     }
-//String[]{typeDrug1, typeDrug2}
 
 
 
-    public static String CompareInteractionScore(List<Interaction> interactions,
-                                               List<Drug> drugs,
-                                               String firstDrugInput,
-                                               String secondDrugInput,
-                                               List<Combination> combinations,
-                                               Set<String> overlap,
-                                               String combinationResult,
-                                               StringBuilder outputSB) {
-
-//        String combinationResult = getCombinationResult(interactions, drugs, firstDrugInput, secondDrugInput, combinations, overlap, outputSB);
-
+    public static String CompareInteractionScore(String combinationResult,
+                                                 List<GeneScore> geneScores,
+                                                 String firstDrugInput,
+                                                 String secondDrugInput,
+                                                 Set<String> overlap,
+                                                 StringBuilder outputSB) {
+        outputSB.append("==== Calculating combined interaction scores ====\n");
+        if (overlap.isEmpty()) {
+            outputSB.append("No gene overlap found; skipping calculation.").append("\n\n");
+            return "unknown";
+        }
         CombinationScoreEffect effectSymbol = CombinationScoreEffect.fromResult(combinationResult);
 
-        outputSB.append("==== Calculating combined interaction scores ====\n");
+        // temporary print:
         outputSB.append("Combination type: ").append(combinationResult);
-        // tijdelijk:
-        outputSB.append("\nSymbol: ").append(effectSymbol.GetSymbol()).append("\n\n");
+        outputSB.append("\nSymbol: ").append(effectSymbol.GetSymbol())
+                .append("\n");
 
 
+        List<String> combinedResults = geneScores.stream()
+                .map(genescore -> {
+                    float combinedScore;
+                    switch (effectSymbol) {
+                        case ENHANCING -> {
+                            combinedScore = genescore.scoreDrug1() + genescore.scoreDrug2();
+                            return genescore.gene() + ": " + genescore.scoreDrug1() + " + " + genescore.scoreDrug2() + " = " + combinedScore;
+                        }
+                        case OPPOSING -> {
+                            combinedScore = genescore.scoreDrug1() - genescore.scoreDrug2();
+                            return genescore.gene() + ": " + genescore.scoreDrug1() + " - " + genescore.scoreDrug2() + " = " + combinedScore;
+                        }
+                        case SYNERGETISCH -> {
+                            combinedScore = genescore.scoreDrug1() + genescore.scoreDrug2();
+                            return genescore.gene() + ": " + genescore.scoreDrug1() + " + " + genescore.scoreDrug2() + "(synergetic) = " + combinedScore;
+                        }
+                        case UNKNOWN -> {
+                            float plus = genescore.scoreDrug1() + genescore.scoreDrug2();
+                            float minus = genescore.scoreDrug1() - genescore.scoreDrug2();
+                            return genescore.gene() + ": " + genescore.scoreDrug1() + " + " + genescore.scoreDrug2() + " = " + plus + "\n\t " +
+                                    genescore.scoreDrug1() + " - " + genescore.scoreDrug2() + " = " + minus;
+                        }
+                    }
+                    return "something went wrong";
+                })
+                .toList();
 
 
-        return "unknown";
+        combinedResults.forEach(line -> outputSB.append(line).append("\n"));
+        return "done";
     }
-
 }

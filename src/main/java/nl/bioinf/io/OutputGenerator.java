@@ -14,20 +14,6 @@ public class OutputGenerator {
         this.output = output;
     }
 
-    // schrijft "no overlap found" als er geen overlap is, anders schrijft hij de overlap genen naar bestand
-//    public void generateOutput(Set<String> overlapGenes) {
-//        try {
-//            if (overlapGenes.isEmpty()){
-//                Files.write(output, List.of("No overlap found.")); // accepteert geen string, dus list van een regel maken :/
-//            }
-//            else {
-//                Files.write(output, overlapGenes);
-//                System.out.println("Overlap genes written to: " + output);
-//            }
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error in writing output overlap genes to: " + output, e); // later e wegghalen
-//        }
-//    }
 
     public void generateOutput(StringBuilder strBuilder) {
         try {
