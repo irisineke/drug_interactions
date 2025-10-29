@@ -8,6 +8,7 @@ import nl.bioinf.io.CombinationScoreEffect;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InteractionChecker {
 
@@ -134,8 +135,9 @@ public class InteractionChecker {
         return "Unknown";
     }
 
+    public record GeneScore(String gene, float scoreDrug1, float scoreDrug2) {}
 
-    public static List<String> GetInteractionScorePerGene(List<Interaction> interactions,
+    public static List<GeneScore> GetInteractionScorePerGene(List<Interaction> interactions,
                                                           List<Drug> drugs,
                                                           String firstDrugInput,
                                                           String secondDrugInput,
@@ -167,26 +169,26 @@ public class InteractionChecker {
 
 
         // door overlappende genen loopen
-        List<String> results = overlap.stream()
+        List<GeneScore> geneScores = overlap.stream()
                 .filter(gene -> scoreDrug1.containsKey(gene) && scoreDrug2.containsKey(gene)) // houdt genen die in beide mappen zitten
-                .map(gene -> { // voor elke gen pakt ie scores van drug 1/2 en maakt er string van
-                    float score1 = scoreDrug1.get(gene);
-                    float score2 = scoreDrug2.get(gene);
-                    return gene + ": " + firstDrugInput + " = " + score1 + ", " + secondDrugInput + " = " + score2;
-                })
+                // voor elke gen pakt ie scores van drug 1/2 en maakt er map van
+                .map(gene -> new GeneScore(gene, scoreDrug1.get(gene), scoreDrug2.get(gene)))
                 .toList();
 
-        if (results.isEmpty()) {
+
+        if (geneScores.isEmpty()) {
             outputSB.append("No overlapping genes with scores found.\n");
         } else {
             outputSB.append("gene: first drug = first drug score, second drug = second drug score\n\n");
-            results.forEach(line -> outputSB.append(line).append("\n")); // schrijft elke gen/score naar output
+            geneScores.forEach(geneScore -> outputSB.append(geneScore.gene())
+                    .append("; ").append(firstDrugInput).append(" = ").append(geneScore.scoreDrug1())
+                    .append("; ").append(secondDrugInput).append(" = ").append(geneScore.scoreDrug2()).append("\n"));
         }
         outputSB.append("\n");
 
-        return results;
+        return geneScores;
     }
-
+//String[]{typeDrug1, typeDrug2}
 
 
 
@@ -207,6 +209,8 @@ public class InteractionChecker {
         outputSB.append("Combination type: ").append(combinationResult);
         // tijdelijk:
         outputSB.append("\nSymbol: ").append(effectSymbol.GetSymbol()).append("\n\n");
+
+
 
 
         return "unknown";
