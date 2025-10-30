@@ -79,45 +79,46 @@ class ReadFilesTest {
         assertEquals("CHEMBL:1544", list.getFirst().conceptId());
     }
 
+
     @Test
-    void processCombinations_readsFromFixedDataPath() throws IOException {
-        Path dataDir = Paths.get("data");
-        Files.createDirectories(dataDir);
-        Path combinations = dataDir.resolve("drug_combinations.tsv");
-        createdCombinationsPath = combinations;
-
-        String content = String.join("\n",
-                "drugtype_1\tdrugtype_2\tresultaat",
-                "TKI\tChemo\tSynergistic",
-                "Hormonal\tTKI\tAntagonistic"
-        );
-        Files.writeString(combinations, content);
-
+    void processCombinations_readsFromResource() throws IOException {
         Path interactions = tempDir.resolve("interactions.tsv");
-        Files.writeString(interactions,
-                "gene_claim_name\tinteraction_type\tinteraction_score\tdrug_concept_id\n");
+        Files.writeString(interactions, "gene_claim_name\tinteraction_type\tinteraction_score\tdrug_concept_id\n");
         Path drugs = tempDir.resolve("drugs.tsv");
         Files.writeString(drugs, "drug_claim_name\tconcept_id\n");
 
         ReadFiles rf = new ReadFiles(interactions.toFile(), drugs.toFile());
         List<Combination> list = rf.processCombinations();
 
-        assertEquals(2, list.size());
-        assertEquals("TKI", list.getFirst().drugType1());
-        assertEquals("Chemo", list.getFirst().drugType2());
-        assertEquals("Synergistic", list.getFirst().resultaat());
+        assertFalse(list.isEmpty(), "Expected the resource file to contain combinations");
+        assertNotNull(list.getFirst().drugType1());
+        assertNotNull(list.getFirst().drugType2());
+        assertNotNull(list.getFirst().resultaat());
     }
 
     @Test
-    void emptyFiles_returnEmptyLists() throws IOException {
-        Path interactions = tempDir.resolve("empty_interactions.tsv");
-        Path drugs = tempDir.resolve("empty_drugs.tsv");
-        Files.writeString(interactions, "");
-        Files.writeString(drugs, "");
+    void processInteractions_throwsExceptionOnMalformedRow() throws IOException {
+        // Maak tijdelijk interacties.tsv met een foute regel (te weinig kolommen)
+        Path interactions = tempDir.resolve("interactions.tsv");
+        String malformedContent = String.join("\n",
+                "gene_claim_name\tinteraction_type\tinteraction_score\tdrug_concept_id",
+                "TP53\tinhibitor\t0.87", // <-- mist drug_concept_id
+                "EGFR\tactivator\t0.45\tCHEMBL:999"
+        );
+        Files.writeString(interactions, malformedContent);
+
+
+        Path drugs = tempDir.resolve("drugs.tsv");
+        Files.writeString(drugs, "drug_claim_name\tconcept_id\n");
 
         ReadFiles rf = new ReadFiles(interactions.toFile(), drugs.toFile());
-        assertTrue(rf.processInteractions().isEmpty());
-        assertTrue(rf.processDrugs().isEmpty());
+
+        // Controleer dat er een IllegalArgumentException wordt gegooid
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, rf::processInteractions);
+
+        // Controleer of de foutmelding duidelijk is
+        assertTrue(thrown.getMessage().contains("Malformed row"),
+                "Foutmelding moet 'Malformed row' vermelden om duidelijk te zijn voor de gebruiker");
     }
 }
 
