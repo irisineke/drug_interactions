@@ -13,6 +13,16 @@ import nl.bioinf.methods.Interaction;
 import nl.bioinf.methods.Drug;
 import nl.bioinf.methods.Combination;
 
+/**
+ * The {@code ArgumentParser} class defines and handles all command-line arguments
+ * for the Drug Interactions program using the Picocli library.
+ * <p>
+ * This program reads two input files (drugs.tsv and interactions.tsv),
+ * accepts two drug names from the user, and determines whether they can be
+ * safely combined. The results are written to an output file.
+ * <p>
+ * Note: this program provides indicative analysis only — it does not offer medical advice.
+ */
 
 
 // name, help en version erin, description
@@ -55,7 +65,19 @@ public class ArgumentParser implements Runnable {
             required = true)
     Path output;
 
-
+    /**
+     * Executes the main workflow of the Drug Interactions program.
+     * <p>
+     * The method performs the following steps:
+     * <ol>
+     *     <li>Validates that both input files exist and are not empty.</li>
+     *     <li>Reads and processes the input data using {@link ReadFiles}.</li>
+     *     <li>Validates the output path using {@link Validate}.</li>
+     *     <li>Analyzes drug interactions using {@link InteractionChecker}.</li>
+     *     <li>Generates the output file using {@link OutputGenerator}.</li>
+     * </ol>
+     * If any step fails, an error message is printed and the program exits with status code 1.
+     */
     @Override
     public void run() {
 
