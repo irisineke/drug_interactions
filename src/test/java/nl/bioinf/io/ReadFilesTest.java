@@ -1,8 +1,8 @@
 package nl.bioinf.io;
 
-import nl.bioinf.methods.Combination;
-import nl.bioinf.methods.Drug;
-import nl.bioinf.methods.Interaction;
+import nl.bioinf.models.Combination;
+import nl.bioinf.models.Drug;
+import nl.bioinf.models.Interaction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
