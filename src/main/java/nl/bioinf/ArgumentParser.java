@@ -104,8 +104,7 @@ public class ArgumentParser implements Runnable {
 
 
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            System.exit(1);
+            throw new RuntimeException(e);
         }
     }
 
