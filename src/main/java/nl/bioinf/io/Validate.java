@@ -11,16 +11,14 @@ import java.util.Locale;
  */
 public class Validate {
     public static void validateOutputPath(Path output) {
-    // Controleer of het een .txt-bestand is
     String fileName = output.getFileName().toString().toLowerCase(Locale.ROOT);
     if (!(fileName.endsWith(".txt") || fileName.endsWith(".pdf"))) {
-        throw new IllegalArgumentException("❌ ERROR: Output file must end with '.txt' → " + output);
+        throw new IllegalArgumentException("ERROR: Output file must end with '.txt' → " + output);
     }
 
-    // Controleer of de directory van het pad bestaat
     Path parent = output.getParent();
     if (parent == null || !Files.exists(parent)) {
-        throw new IllegalArgumentException("❌ ERROR: Output directory does not exist → " + parent);
+        throw new IllegalArgumentException("ERROR: Output directory does not exist → " + parent);
     }
 }
 }
