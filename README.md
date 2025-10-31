@@ -6,26 +6,33 @@ This project uses two drug inputs and two data files (`interactions.tsv` and `dr
 
 ```
 src/main/java/nl/bioinf/
-│
 ├── io/
-│   ├── ReadFiles          # Reads and processes input files
-│   ├── OutputGenerator    # Generates output based on analysis
+│ ├── CombinationScoreEffect # Enumeration for drug interaction effects
+│ ├── OutputGenerator # Handles writing output files (.txt / .pdf)
+│ ├── ReadFiles # Reads and processes input .tsv data files
+│ └── Validate # Validates file paths and input arguments
 │
 ├── logic/
-│   └── InteractionChecker # Extracts interaction data and determines outcomes
+│ └── InteractionChecker # Core logic: compares drugs, finds overlaps, calculates results
 │
-├── methods/
-│   └── (Data Models)      # Custom data types: Drug, Interaction, Combination
-│
-├── ArgumentParser         # Handles command-line input via Picocli
-└── Main                    # Entry point of the application
+├── models/
+│ ├── ArgumentParser # Handles CLI input and program configuration
+│ └── Main # Entry point of the application
 ```
+
+Each class is responsible for a single, clear task:
+- **ReadFiles** loads and processes the `.tsv` data.
+- **InteractionChecker** performs the logic: overlaps, scores, and combination outcomes.
+- **OutputGenerator** handles report generation (supports `.txt` and `.pdf`).
+- **ArgumentParser** coordinates input and runs the analysis.
+- **Data model classes** (`Drug`, `Interaction`, `Combination`, `GeneScore`) represent structured, immutable domain data.
+
 
 ## 🛠 Installation
 
 ### ✅ Requirements
 
-* **Java 17 or higher** (Java 21+ recommended)
+* **Java 24 or higher** (Java 24+ recommended)
 * Access to drug interaction data from **DGIdb** or **DrugBank**
 
 ### 1️⃣ Download Data
@@ -63,14 +70,22 @@ java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar \
   -o results/output.txt
 ```
 
+### ⚠️ Warning
+
+If you are using a drug with a special charicter please use "" around the drugs
+
+For example: 
+
+"BRAF(V600E) Kinase Inhibitor RO5212054"
+
 ## 🧪 Testing (JUnit 5)
 
 Tests focus on:
-
-* File validation (`fileNotEmptyCheck`)
-* CLI argument parsing (Picocli)
+* File validation (fileNotEmptyCheck)
+* CLI parsing (Picocli)
 * Data reading (ReadFiles)
-* Interaction logic (InteractionChecker)
+* Core logic (InteractionChecker)
+* Output generation and exception handling (OutputGenerator)
 
 Run tests with:
 
