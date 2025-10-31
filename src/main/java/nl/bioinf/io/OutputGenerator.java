@@ -31,11 +31,15 @@ public class OutputGenerator {
             generateTxt(stringBuilder);
         } else
             generatePdf(stringBuilder);
-
     }
+
     private void generateTxt(StringBuilder strBuilder) {
         try {
-            List<String> lines = List.of(strBuilder.toString().split("\n"));
+            List<String> lines;
+            try (var reader = new java.io.BufferedReader(new java.io.StringReader(strBuilder.toString()))) {
+                lines = reader.lines().toList();
+            }
+
             Files.write(output, lines);
             System.out.println(" Text file successfully written to: " + output);
         } catch (IOException e) {
