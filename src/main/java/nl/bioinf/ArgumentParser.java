@@ -99,8 +99,6 @@ public class ArgumentParser implements Runnable {
     @Override
     public void run() {
         try {
-            fileNotEmptyCheck("Interactions file", interactionsFile.getAbsolutePath());
-            fileNotEmptyCheck("Drugs file", drugsFile.getAbsolutePath());
             Validate.validateDifferentDrugs(firstDrugInput, secondDrugInput);
             Validate.validateOutputPath(output);
 
@@ -127,20 +125,6 @@ public class ArgumentParser implements Runnable {
 
         } catch (Exception e) {
             System.err.println("ERROR: " + e.getMessage());
-        }
-    }
-
-    public void fileNotEmptyCheck(String name, String value) {
-        File file = new File(value);
-
-        if (!file.exists()) {
-            throw new IllegalArgumentException("ERROR: " + name + " does not exist :(");
-        }
-        if (!file.isFile()) {
-            throw new IllegalArgumentException("ERROR: " + name + " is not a file :(");
-        }
-        if (file.length() == 0) {
-            throw new IllegalArgumentException("ERROR: " + name + " is empty :(");
         }
     }
 }
