@@ -14,7 +14,7 @@ public class InteractionChecker {
 
     private static String getConceptID(List<Drug> drugs, String drugInput) {
         return drugs.stream()
-                .filter(drug -> drug.drugClaimName().equalsIgnoreCase(drugInput)) // gebruikt getter
+                .filter(drug -> drug.drugClaimName().equalsIgnoreCase(drugInput))
                 .map(Drug::conceptId)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Drug not found: " + drugInput));
@@ -47,8 +47,8 @@ public class InteractionChecker {
                 .collect(Collectors.toSet());
 
 // find overlap between drugs:
-        Set<String> overlap = genesDrug1.stream() // eerste alle genen van drug1 pakken
-                .filter(genesDrug2::contains) // bewaar alleen die die ook in drug 2 voorkomen
+        Set<String> overlap = genesDrug1.stream()
+                .filter(genesDrug2::contains)
                 .collect(Collectors.toSet());
 
         outputSB.append("Number of genes influenced by ").append(firstDrugInput).append(": ").append(genesDrug1.size()).append("\n");
@@ -60,7 +60,7 @@ public class InteractionChecker {
         } else {
             outputSB.append("Number of overlapping genes: ").append(overlap.size()).append("\n");
             outputSB.append("Overlapping genes: ").append("\n");
-            overlap.forEach(gene -> outputSB.append(gene).append("\n")); // print alle regels uit overlap
+            overlap.forEach(gene -> outputSB.append(gene).append("\n"));
         }
 
         outputSB.append("\n");
@@ -164,8 +164,8 @@ public class InteractionChecker {
 
 
         List<GeneScore> geneScores = overlap.stream()
-                .filter(gene -> scoreDrug1.containsKey(gene) && scoreDrug2.containsKey(gene)) // houdt genen die in beide mappen zitten
-                // voor elke gen pakt ie scores van drug 1/2 en maakt er map van
+                .filter(gene -> scoreDrug1.containsKey(gene) && scoreDrug2.containsKey(gene))
+                // for each gene it takes scores from drug 1/2 and creates a map
                 .map(gene -> new GeneScore(gene, scoreDrug1.get(gene), scoreDrug2.get(gene)))
                 .toList();
 
@@ -226,7 +226,6 @@ public class InteractionChecker {
                 })
                 .toList();
 
-//        text explanation per gene:
         List<String> explanationLines = geneScores.stream()
                 .map(genescore -> {
                     float combinedScore;

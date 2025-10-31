@@ -110,7 +110,7 @@ public class ReadFiles {
 
     private int indexOf(String[] headers, String name, File file) {
         for (int i = 0; i < headers.length; i++) {
-            if (headers[i].equals(name)) return i; // evt. equalsIgnoreCase
+            if (headers[i].equals(name)) return i;
         }
         throw new IllegalArgumentException("Header not found: '" + name + "' in file: " + file.getAbsolutePath());
     }
@@ -151,7 +151,7 @@ public class ReadFiles {
 
             for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
-                if (line.isBlank()) continue; // sla lege regels over
+                if (line.isBlank()) continue; // skip empty lines
 
                 String[] parts = line.split("\t", -1);
 
@@ -201,7 +201,7 @@ public class ReadFiles {
 
             for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
-                if (line.isBlank()) continue; // sla lege regels over
+                if (line.isBlank()) continue;
 
                 String[] parts = line.split("\t", -1);
                 int maxIndex = Math.max(idxName, idxId);

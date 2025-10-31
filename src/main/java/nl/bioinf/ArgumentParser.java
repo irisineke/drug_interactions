@@ -34,13 +34,13 @@ import nl.bioinf.models.Combination;
 
 public class ArgumentParser implements Runnable {
     @Option(names = { "-intF", "--interactionsFile" },
-            paramLabel = "interactionsFile", // zo heet hij in help
+            paramLabel = "interactionsFile",
             description = "the input file. for example: interactions.tsv", // ook in help
             required = true)
     File interactionsFile;
 
     @Option(names = { "-drF", "--drugsFile" },
-            paramLabel = "drugsFile", // zo heet hij in help
+            paramLabel = "drugsFile",
             description = "the input file. for example: drugs.tsv", // ook in help
             required = true)
     File drugsFile;
@@ -113,14 +113,14 @@ public class ArgumentParser implements Runnable {
         File file = new File(value);
 
         if (!file.exists()) {
-            throw new IllegalArgumentException("❌ ERROR: " + name + " does not exist :(");
+            throw new IllegalArgumentException("ERROR: " + name + " does not exist :(");
         }
         if (!file.isFile()){
-            throw new IllegalArgumentException("❌ ERROR: " + name + " is not a file :(");
+            throw new IllegalArgumentException("ERROR: " + name + " is not a file :(");
         }
 
         if (file.length() == 0) {
-            throw new IllegalArgumentException("❌ ERROR: " + name + " is empty :(");
+            throw new IllegalArgumentException("ERROR: " + name + " is empty :(");
         }
 
     }
