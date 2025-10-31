@@ -3,11 +3,19 @@ package nl.bioinf;
 import nl.bioinf.io.*;
 import nl.bioinf.io.OutputGenerator;
 import nl.bioinf.logic.InteractionChecker;
-import picocli.CommandLine.*;
+
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.IParameterConsumer;
+import picocli.CommandLine.Model.ArgSpec;
+import picocli.CommandLine.Model.CommandSpec;
+
+
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import nl.bioinf.models.Interaction;
 import nl.bioinf.models.Drug;
@@ -23,38 +31,63 @@ import nl.bioinf.models.Combination;
  * <p>
  * Note: this program provides indicative analysis only — it does not offer medical advice.
  */
-
-
-
-@Command (name = "Drug Interactions",
+@Command(
+        name = "Drug Interactions",
         mixinStandardHelpOptions = true,
         version = "Drug Interactions 1.0",
-        description = "This program uses two drug inputs and two file inputs (drug.tsv and interaction.tsv) and performs an assessment. The program then assesses whether these can be safely combined. The program does not offer binding medical advice, but rather indicative support to identify potential risks at an earlier stage.\n")
-
-
+        description = "This program uses two drug inputs and two file inputs (drug.tsv and interaction.tsv) and performs an assessment. The program then assesses whether these can be safely combined. The program does not offer binding medical advice, but rather indicative support to identify potential risks at an earlier stage.\n"
+)
 public class ArgumentParser implements Runnable {
+
+    /**
+     * Consumer die na het eerste token alle opeenvolgende tokens (tot het volgende
+     * argument dat met '-') samenvoegt, zodat waarden met spaties ook zonder quotes werken.
+     */
+    static class MultiWordParameterConsumer implements IParameterConsumer {
+        @Override
+        public void consumeParameters(Stack<String> args, ArgSpec argSpec, CommandSpec commandSpec) {
+            if (args.isEmpty()) {
+                argSpec.setValue(null);
+                return;
+            }
+            StringBuilder sb = new StringBuilder();
+            while (!args.isEmpty()) {
+                String next = args.peek();
+                // Stop bij volgende optie
+                if (next.startsWith("-")) break;
+                sb.append(args.pop());
+                if (!args.isEmpty() && !args.peek().startsWith("-")) {
+                    sb.append(" ");
+                }
+            }
+            argSpec.setValue(sb.toString());
+        }
+    }
+
     @Option(names = { "-intF", "--interactionsFile" },
             paramLabel = "interactionsFile",
-            description = "the input file. for example: interactions.tsv", // ook in help
+            description = "the input file. for example: interactions.tsv",
             required = true)
     File interactionsFile;
 
     @Option(names = { "-drF", "--drugsFile" },
             paramLabel = "drugsFile",
-            description = "the input file. for example: drugs.tsv", // ook in help
+            description = "the input file. for example: drugs.tsv",
             required = true)
     File drugsFile;
 
     @Option(names = {"--drug1", "-d1"},
             paramLabel = "firstDrugInput",
             description = "put the first drug you want to compare here",
-            required = true)
+            required = true,
+            parameterConsumer = MultiWordParameterConsumer.class)
     String firstDrugInput;
 
     @Option(names = {"--drug2", "-d2"},
             paramLabel = "secondDrugInput",
             description = "put the second drug you want to compare here",
-            required = true)
+            required = true,
+            parameterConsumer = MultiWordParameterConsumer.class)
     String secondDrugInput;
 
     @Option(names = {"--output", "-o"},
@@ -63,35 +96,22 @@ public class ArgumentParser implements Runnable {
             required = true)
     Path output;
 
-    /**
-     * Executes the main workflow of the Drug Interactions program.
-     * <p>
-     * The method performs the following steps:
-     * <ol>
-     *     <li>Validates that both input files exist and are not empty.</li>
-     *     <li>Reads and processes the input data using {@link ReadFiles}.</li>
-     *     <li>Validates the output path using {@link Validate}.</li>
-     *     <li>Analyzes drug interactions using {@link InteractionChecker}.</li>
-     *     <li>Generates the output file using {@link OutputGenerator}.</li>
-     * </ol>
-     * If any step fails, an error message is printed and the program exits with status code 1.
-     */
     @Override
     public void run() {
-
         try {
             fileNotEmptyCheck("Interactions file", interactionsFile.getAbsolutePath());
             fileNotEmptyCheck("Drugs file", drugsFile.getAbsolutePath());
+            Validate.validateDifferentDrugs(firstDrugInput, secondDrugInput);
+            Validate.validateOutputPath(output);
 
             ReadFiles lb = new ReadFiles(interactionsFile, drugsFile);
             List<Interaction> interactions = lb.processInteractions();
             List<Drug> drugs = lb.processDrugs();
             List<Combination> combinations = lb.processCombinations();
 
-            Validate.validateOutputPath(output);
 
-            InteractionChecker checker = new InteractionChecker(interactions, drugs, combinations, firstDrugInput, secondDrugInput);
-//            StringBuilder outputSB = new StringBuilder();
+            InteractionChecker checker = new InteractionChecker(
+                    interactions, drugs, combinations, firstDrugInput, secondDrugInput);
 
             Set<String> overlap = checker.geneOverlap();
             checker.getInteractionTypes();
@@ -102,26 +122,25 @@ public class ArgumentParser implements Runnable {
             OutputGenerator generator = new OutputGenerator(output);
             generator.generateOutput(checker.getOutputSB());
 
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.err.println("ERROR: " + e.getMessage());
         }
     }
 
-
-    public void fileNotEmptyCheck(String name, String value){
+    public void fileNotEmptyCheck(String name, String value) {
         File file = new File(value);
 
         if (!file.exists()) {
             throw new IllegalArgumentException("ERROR: " + name + " does not exist :(");
         }
-        if (!file.isFile()){
+        if (!file.isFile()) {
             throw new IllegalArgumentException("ERROR: " + name + " is not a file :(");
         }
-
         if (file.length() == 0) {
             throw new IllegalArgumentException("ERROR: " + name + " is empty :(");
         }
-
     }
 }

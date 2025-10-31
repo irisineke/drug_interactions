@@ -29,8 +29,11 @@ public class OutputGenerator {
 
         if (fileName.endsWith(".txt")) {
             generateTxt(stringBuilder);
-        } else
+        } else if (fileName.endsWith(".pdf")) {
             generatePdf(stringBuilder);
+        } else {
+            throw new IllegalArgumentException("Unsupported output format: " + fileName);
+        }
     }
 
     private void generateTxt(StringBuilder strBuilder) {

@@ -152,5 +152,68 @@ class InteractionCheckerTest {
         String out = checker.getOutputSB().toString();
         assertTrue(out.contains("CYP2C9"));
     }
+    @Test
+    void compareInteractionScore_skipsWhenNoOverlap() {
+        String result = checker.compareInteractionScore(
+                "whatever",
+                List.of(),
+                Collections.emptySet()
+        );
+
+        assertEquals("unknown", result.toLowerCase());
+        String out = checker.getOutputSB().toString();
+        assertTrue(out.contains("==== Calculating combined interaction scores ===="));
+        assertTrue(out.contains("No gene overlap found; skipping calculation."));
+    }
+    @Test
+    void compareInteractionScore_unknownEffect_printsPlusAndMinusAndExplanation() {
+        Set<String> overlap = Set.of("CYP2C9","CYP2D6");
+        var scores = checker.getInteractionScorePerGene(overlap);
+
+        // maak output leeg voor een schone assert
+        checker.getOutputSB().setLength(0);
+
+        String res = checker.compareInteractionScore("__unmapped__", scores, overlap);
+        assertEquals("done", res);
+
+        String out = checker.getOutputSB().toString();
+
+        // headers aanwezig?
+        assertTrue(out.contains("==== Calculating combined interaction scores ===="));
+        assertTrue(out.contains("==== Calculation Results ===="));
+        assertTrue(out.contains("is increased by"));
+        assertTrue(out.contains("or decreased by"));
+
+        // PLUS-regels: "GENE: a + b = c"
+        for (String gene : overlap) {
+            var plus = java.util.regex.Pattern
+                    .compile(java.util.regex.Pattern.quote(gene) + ":\\s+([0-9.Ee+-]+)\\s\\+\\s([0-9.Ee+-]+)\\s=\\s([0-9.Ee+-]+)")
+                    .matcher(out);
+            assertTrue(plus.find(), "Plus-regel voor " + gene + " niet gevonden");
+
+            // optioneel: numeriek controleren
+            double a = Double.parseDouble(plus.group(1));
+            double b = Double.parseDouble(plus.group(2));
+            double c = Double.parseDouble(plus.group(3));
+            assertEquals(a + b, c, 1e-9, "Plus-som klopt niet voor " + gene);
+        }
+
+        // MIN-regels: geen genenaam, patroon: "a - b = d" (op een nieuwe regel)
+        var minusAll = java.util.regex.Pattern
+                .compile("(?m)^\\s*([0-9.Ee+-]+)\\s-\\s([0-9.Ee+-]+)\\s=\\s([0-9.Ee+-]+)\\s*$")
+                .matcher(out);
+
+        int minusCount = 0;
+        while (minusAll.find()) {
+            double x = Double.parseDouble(minusAll.group(1));
+            double y = Double.parseDouble(minusAll.group(2));
+            double d = Double.parseDouble(minusAll.group(3));
+            assertEquals(x - y, d, 1e-9, "Verschil klopt niet");
+            minusCount++;
+        }
+
+        // we verwachten minstens één min-regel per gene in overlap
+        assertTrue(minusCount >= overlap.size(), "Niet genoeg '-' regels gevonden");
+    }
 }
 
