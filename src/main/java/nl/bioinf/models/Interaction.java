@@ -1,4 +1,4 @@
-package nl.bioinf.methods;
+package nl.bioinf.models;
 
 public record Interaction(
         String geneClaimName,

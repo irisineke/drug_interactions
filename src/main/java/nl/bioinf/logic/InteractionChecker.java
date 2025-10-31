@@ -1,8 +1,8 @@
 package nl.bioinf.logic;
 
-import nl.bioinf.methods.Combination;
-import nl.bioinf.methods.Drug;
-import nl.bioinf.methods.Interaction;
+import nl.bioinf.models.Combination;
+import nl.bioinf.models.Drug;
+import nl.bioinf.models.Interaction;
 import nl.bioinf.io.CombinationScoreEffect;
 
 import java.util.List;
@@ -101,7 +101,7 @@ public class InteractionChecker {
                                               List<Combination> combinations,
                                               Set<String> overlap,
                                               StringBuilder outputSB) {
-        outputSB.append("==== Combination drugs Result ==== \n");
+        outputSB.append("==== Combination drugs ==== \n");
         if (overlap.isEmpty()) {
             outputSB.append("No gene overlap found; skipping combination result.").append("\n\n");
             return "unknown";
