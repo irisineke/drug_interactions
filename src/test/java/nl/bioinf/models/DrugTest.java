@@ -1,6 +1,4 @@
-package nl.bioinf.methods;
-
-import static org.junit.jupiter.api.Assertions.*;
+package nl.bioinf.models;
 
 class DrugTest {
     public record Drug(String drugClaimName, String conceptId) { }

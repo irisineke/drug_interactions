@@ -1,8 +1,8 @@
 package nl.bioinf.logic;
 
-import nl.bioinf.methods.Combination;
-import nl.bioinf.methods.Drug;
-import nl.bioinf.methods.Interaction;
+import nl.bioinf.models.Combination;
+import nl.bioinf.models.Drug;
+import nl.bioinf.models.Interaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -169,7 +169,7 @@ class InteractionCheckerTest {
         );
 
         assertEquals(1, lines.size());
-        assertTrue(lines.get(0).startsWith("CYP2C9: "));
+        assertTrue(lines.getFirst().startsWith("CYP2C9: "));
     }
 }
 
