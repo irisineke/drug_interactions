@@ -34,7 +34,7 @@ bin/
 /dist/
 /nbdist/
 /.nb-gradle/
-.idea
+.idea/
 .gradlew.bat
 
 ### VS Code ###
