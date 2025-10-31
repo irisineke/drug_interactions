@@ -90,20 +90,21 @@ public class ArgumentParser implements Runnable {
 
             Validate.validateOutputPath(output);
 
-            InteractionChecker checker = new InteractionChecker();
-            StringBuilder outputSB = new StringBuilder();
-            Set<String> overlap = checker.geneOverlap(interactions, drugs, firstDrugInput, secondDrugInput, outputSB);
-            checker.getInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
-            String combinationResult = checker.getCombinationResult(interactions, drugs, firstDrugInput, secondDrugInput, combinations, overlap, outputSB);
-            List<InteractionChecker.GeneScore> geneScores = checker.GetInteractionScorePerGene(interactions, drugs, firstDrugInput, secondDrugInput, overlap, outputSB);
-            checker.CompareInteractionScore(combinationResult, geneScores, firstDrugInput, secondDrugInput, overlap, outputSB);
+            InteractionChecker checker = new InteractionChecker(interactions, drugs, combinations, firstDrugInput, secondDrugInput);
+//            StringBuilder outputSB = new StringBuilder();
+
+            Set<String> overlap = checker.geneOverlap();
+            checker.getInteractionTypes();
+            String combinationResult = checker.getCombinationResult(overlap);
+            List<InteractionChecker.GeneScore> geneScores = checker.getInteractionScorePerGene(overlap);
+            checker.compareInteractionScore(combinationResult, geneScores, overlap);
 
             OutputGenerator generator = new OutputGenerator(output);
-            generator.generateOutput(outputSB);
+            generator.generateOutput(checker.getOutputSB());
 
 
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            System.err.println("Error: " + e.getMessage());
             System.exit(1);
         }
     }

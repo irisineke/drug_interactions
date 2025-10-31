@@ -11,8 +11,32 @@ import java.util.stream.Collectors;
 
 
 public class InteractionChecker {
+    private final List<Interaction> interactions;
+    private final List<Drug> drugs;
+    private final List<Combination> combinations;
+    private final String firstDrugInput;
+    private final String secondDrugInput;
+    private final StringBuilder outputSB;
 
-    private static String getConceptID(List<Drug> drugs, String drugInput) {
+    public InteractionChecker (List<Interaction> interactions,
+                               List<Drug> drugs,
+                               List<Combination> combinations,
+                               String firstDrugInput,
+                               String secondDrugInput) {
+        this.drugs = drugs;
+        this.interactions = interactions;
+        this.combinations = combinations;
+        this.firstDrugInput = firstDrugInput;
+        this.secondDrugInput = secondDrugInput;
+        this.outputSB = new StringBuilder();
+    }
+
+    public StringBuilder getOutputSB() {
+        return outputSB;
+    }
+
+
+    private String getConceptID(String drugInput) {
         return drugs.stream()
                 .filter(drug -> drug.drugClaimName().equalsIgnoreCase(drugInput))
                 .map(Drug::conceptId)
@@ -20,14 +44,10 @@ public class InteractionChecker {
                 .orElseThrow(() -> new IllegalArgumentException("Drug not found: " + drugInput));
     }
 
-    public Set<String> geneOverlap(List<Interaction> interactions,
-                                   List<Drug> drugs,
-                                   String firstDrugInput,
-                                   String secondDrugInput,
-                                   StringBuilder outputSB) {
+    public Set<String> geneOverlap() {
 
-        String idDrug1 = getConceptID(drugs, firstDrugInput);
-        String idDrug2 = getConceptID(drugs, secondDrugInput);
+        String idDrug1 = getConceptID(firstDrugInput);
+        String idDrug2 = getConceptID(secondDrugInput);
 
 
         outputSB.append("==== Find overlap genes ==== \n");
@@ -68,46 +88,37 @@ public class InteractionChecker {
     }
 
 
-    public static String[] getInteractionTypes(List<Interaction> interactions,
-                                               List<Drug> drugs,
-                                               String firstDrugInput,
-                                               String secondDrugInput) {
+    public String[] getInteractionTypes() {
 
-        String idDrug1 = getConceptID(drugs, firstDrugInput);
-        String idDrug2 = getConceptID(drugs, secondDrugInput);
+        String idDrug1 = getConceptID(firstDrugInput);
+        String idDrug2 = getConceptID(secondDrugInput);
 
 
         String typeDrug1 = interactions.stream()
                 .filter(interaction -> interaction.drugConceptId().equals(idDrug1))
                 .map(Interaction::interactionType)
                 .findFirst()
-                .orElse("Unkown");
+                .orElse("Unknown");
 
         String typeDrug2 = interactions.stream()
                 .filter(interaction -> interaction.drugConceptId().equals(idDrug2))
                 .map(Interaction::interactionType)
                 .findFirst()
-                .orElse("Unkown");
+                .orElse("Unknown");
 
 
         return new String[]{typeDrug1, typeDrug2};
     }
 
 
-    public static String getCombinationResult(List<Interaction> interactions,
-                                              List<Drug> drugs,
-                                              String firstDrugInput,
-                                              String secondDrugInput,
-                                              List<Combination> combinations,
-                                              Set<String> overlap,
-                                              StringBuilder outputSB) {
+    public String getCombinationResult(Set<String> overlap) {
         outputSB.append("==== Combination drugs ==== \n");
         if (overlap.isEmpty()) {
             outputSB.append("No gene overlap found; skipping combination result.").append("\n\n");
             return "unknown";
         }
 
-        String[] types = getInteractionTypes(interactions, drugs, firstDrugInput, secondDrugInput);
+        String[] types = getInteractionTypes();
         String typeDrug1 = types[0];
         String typeDrug2 = types[1];
 
@@ -133,15 +144,10 @@ public class InteractionChecker {
 
     public record GeneScore(String gene, float scoreDrug1, float scoreDrug2) {}
 
-    public static List<GeneScore> GetInteractionScorePerGene(List<Interaction> interactions,
-                                                          List<Drug> drugs,
-                                                          String firstDrugInput,
-                                                          String secondDrugInput,
-                                                          Set<String> overlap,
-                                                          StringBuilder outputSB) {
+    public List<GeneScore> getInteractionScorePerGene(Set<String> overlap) {
 
-        String idDrug1 = getConceptID(drugs, firstDrugInput);
-        String idDrug2 = getConceptID(drugs, secondDrugInput);
+        String idDrug1 = getConceptID(firstDrugInput);
+        String idDrug2 = getConceptID(secondDrugInput);
         System.out.println(firstDrugInput);
 
         outputSB.append("==== Interaction scores per overlap genes ====\n");
@@ -185,12 +191,9 @@ public class InteractionChecker {
 
 
 
-    public static String CompareInteractionScore(String combinationResult,
+    public String compareInteractionScore(String combinationResult,
                                                  List<GeneScore> geneScores,
-                                                 String firstDrugInput,
-                                                 String secondDrugInput,
-                                                 Set<String> overlap,
-                                                 StringBuilder outputSB) {
+                                                 Set<String> overlap) {
         outputSB.append("==== Calculating combined interaction scores ====\n");
         if (overlap.isEmpty()) {
             outputSB.append("No gene overlap found; skipping calculation.").append("\n\n");
