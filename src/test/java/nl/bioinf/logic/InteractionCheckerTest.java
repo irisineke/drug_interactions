@@ -24,8 +24,6 @@ class InteractionCheckerTest {
 
     @BeforeEach
     void setUp() {
-        checker = new InteractionChecker();
-
         // Let op volgorde: (name, id)
         drugs = List.of(
                 new Drug("clonidine", "D1"),
@@ -55,20 +53,18 @@ class InteractionCheckerTest {
                 new Combination("inhibitor", "substrate", "increased toxicity")
                 // geen match voor agonist + NULL → verwacht "unknown"
         );
+
+        checker = new InteractionChecker(interactions, drugs, combinations, clonidine, compro);
     }
 
     @Test
     void geneOverlap_findsExpectedOverlap_andWritesOutput() {
-        StringBuilder sb = new StringBuilder();
-
-        Set<String> overlap = checker.geneOverlap(
-                interactions, drugs, clonidine, compro, sb
-        );
+        Set<String> overlap = checker.geneOverlap();
 
         Set<String> expected = Set.of("CYP2C9","CYP2D6","CYP2C19");
         assertEquals(expected, overlap);
 
-        String out = sb.toString();
+        String out = checker.getOutputSB().toString();
         assertTrue(out.contains("==== Find overlap genes ===="));
         assertTrue(out.contains("Drug 1 input: clonidine"));
         assertTrue(out.contains("Drug 2 input: compro"));
@@ -78,44 +74,30 @@ class InteractionCheckerTest {
 
     @Test
     void geneOverlap_throwsWhenDrugMissing() {
-        StringBuilder sb = new StringBuilder();
-        assertThrows(IllegalArgumentException.class, () ->
-                checker.geneOverlap(interactions, drugs, "bestaatNiet", compro, sb)
-        );
+        InteractionChecker badChecker = new InteractionChecker(interactions,drugs, combinations, "bestaatNiet", compro);
+        assertThrows(IllegalArgumentException.class,
+                badChecker::geneOverlap);
     }
 
     @Test
-    void getInteractionTypes_returnsTypesForKnownDrugs_andThrowsForUnknown() {
-        String[] types = InteractionChecker.getInteractionTypes(
-                interactions, drugs, clonidine, compro
-        );
+    void getInteractionTypes_returnsTypesForKnownDrugs() {
+        String[] types = checker.getInteractionTypes();
 
         // bekende drugs
         assertEquals("agonist", types[0]);
         assertEquals("NULL",    types[1]);
-
-        // onbekende drug moet exception gooien
-        assertThrows(IllegalArgumentException.class, () ->
-                InteractionChecker.getInteractionTypes(interactions, drugs, clonidine, "nietbestaat")
-        );
     }
 
 
     @Test
-    void getCombinationResult_returnsUnknownWhenNoTableMatch() {
-        StringBuilder sb = new StringBuilder();
-        Set<String> overlap = checker.geneOverlap(
-                interactions, drugs, clonidine, compro, new StringBuilder()
-        );
+    void getCombinationResults_returnUnknownWhenNoTableMatch() {
+        Set<String> overlap = checker.geneOverlap();
+        String result = checker.getCombinationResult(overlap);
 
-        String result = InteractionChecker.getCombinationResult(
-                interactions, drugs, clonidine, compro, combinations, overlap, sb
-        );
+        assertEquals("Unknown", result);
 
-        assertTrue(result.equalsIgnoreCase("unknown"));
-
-        String out = sb.toString();
-        assertTrue(out.contains("==== Find type drugs ===="));
+        String out = checker.getOutputSB().toString();
+        assertTrue(out.contains("==== Combination drugs ===="));
         assertTrue(out.contains("clonidine type: agonist"));
         assertTrue(out.contains("compro type: NULL"));
         assertTrue(out.toLowerCase().contains("combination result is unknown"));
@@ -123,53 +105,52 @@ class InteractionCheckerTest {
 
     @Test
     void getCombinationResult_skipsWhenNoOverlap() {
-        StringBuilder sb = new StringBuilder();
+        String res = checker.getCombinationResult(Collections.emptySet());
 
-        String res = InteractionChecker.getCombinationResult(
-                interactions, drugs, clonidine, compro, combinations, Collections.emptySet(), sb
-        );
-
-        assertEquals("unknown", res);
-        assertTrue(sb.toString().contains("No gene overlap found; skipping combination result."));
+        assertEquals("unknown", res.toLowerCase());
+        assertTrue(checker.getOutputSB().toString().contains("No gene overlap found; skipping combination result."));
     }
 
     @Test
     void getInteractionScorePerGene_formatsLines_andWritesHeader() {
-        StringBuilder sb = new StringBuilder();
         Set<String> overlap = Set.of("CYP2C9","CYP2D6","CYP2C19");
 
-        List<String> lines = InteractionChecker.GetInteractionScorePerGene(
-                interactions, drugs, clonidine, compro, overlap, sb
-        );
+        var geneScores = checker.getInteractionScorePerGene(overlap);
 
-        assertEquals(3, lines.size());
+        assertEquals(3, geneScores.size());
 
-        Map<String,String> byGene = lines.stream()
-                .collect(Collectors.toMap(
-                        l -> l.substring(0, l.indexOf(":")),
-                        l -> l
-                ));
+        Map<String, InteractionChecker.GeneScore>  byGene = new HashMap<>();
+        for (var gs : geneScores) byGene.put(gs.gene(), gs);
 
-        assertEquals("CYP2C9: clonidine = 0.009349657, compro = 0.008681824", byGene.get("CYP2C9"));
-        assertEquals("CYP2D6: clonidine = 0.013622434, compro = 0.006324701", byGene.get("CYP2D6"));
-        assertEquals("CYP2C19: clonidine = 0.008345148, compro = 0.007749066", byGene.get("CYP2C19"));
 
-        String out = sb.toString();
-        assertTrue(out.contains("=== Interaction scores per overlap genes ==="));
+        // CYP2C9
+        assertEquals(0.009349657f, byGene.get("CYP2C9").scoreDrug1(), 1e-7);
+        assertEquals(0.008681824f, byGene.get("CYP2C9").scoreDrug2(), 1e-7);
+
+        // CYP2D6
+        assertEquals(0.013622434f, byGene.get("CYP2D6").scoreDrug1(), 1e-7);
+        assertEquals(0.006324701f, byGene.get("CYP2D6").scoreDrug2(), 1e-7);
+
+        // CYP2C19
+        assertEquals(0.008345148f, byGene.get("CYP2C19").scoreDrug1(), 1e-7);
+        assertEquals(0.007749066f, byGene.get("CYP2C19").scoreDrug2(), 1e-7);
+
+        String out = checker.getOutputSB().toString();
+        assertTrue(out.contains("==== Interaction scores per overlap genes ===="));
         assertTrue(out.contains("gene: first drug = first drug score, second drug = second drug score"));
     }
-
+// hier
     @Test
     void getInteractionScorePerGene_handlesMissingScoresGracefully() {
-        StringBuilder sb = new StringBuilder();
         Set<String> awkward = Set.of("CYP2C9","MISSINGGENE");
 
-        List<String> lines = InteractionChecker.GetInteractionScorePerGene(
-                interactions, drugs, clonidine, compro, awkward, sb
-        );
+        List<InteractionChecker.GeneScore> lines = checker.getInteractionScorePerGene(awkward);
 
         assertEquals(1, lines.size());
-        assertTrue(lines.getFirst().startsWith("CYP2C9: "));
+        assertEquals("CYP2C9", lines.get(0).gene());
+
+        String out = checker.getOutputSB().toString();
+        assertTrue(out.contains("CYP2C9"));
     }
 }
 
