@@ -9,7 +9,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
+/**
+ * InteractionChecker is responsible for analyzing interactions between two drugs,
+ * finding overlapping genes, computing interaction types and scores, and generating
+ * a detailed output report.
+ */
 public class InteractionChecker {
     private final List<Interaction> interactions;
     private final List<Drug> drugs;
@@ -18,6 +22,15 @@ public class InteractionChecker {
     private final String secondDrugInput;
     private final StringBuilder outputSB;
 
+    /**
+     * Constructs an InteractionChecker instance with the given data.
+     *
+     * @param interactions List of known drug-gene interactions.
+     * @param drugs List of drugs names.
+     * @param combinations List of drug combinations with interaction results.
+     * @param firstDrugInput Name of the first drug for comparison.
+     * @param secondDrugInput Name of the second drug for comparison.
+     */
     public InteractionChecker (List<Interaction> interactions,
                                List<Drug> drugs,
                                List<Combination> combinations,
@@ -31,11 +44,22 @@ public class InteractionChecker {
         this.outputSB = new StringBuilder();
     }
 
+    /**
+     * Returns the StringBuilder containing the generated output report.
+     *
+     * @return StringBuilder with message of the analysis.
+     */
     public StringBuilder getOutputSB() {
         return outputSB;
     }
 
-
+    /**
+     * returns the concept ID for a given drug input name.
+     * 
+     * @param drugInput The name of the drug.
+     * @return The concept ID of the drug.
+     * @throws IllegalArgumentException if the drug is not found.
+     */
     private String getConceptID(String drugInput) {
         return drugs.stream()
                 .filter(drug -> drug.drugClaimName().equalsIgnoreCase(drugInput))
@@ -44,6 +68,11 @@ public class InteractionChecker {
                 .orElseThrow(() -> new IllegalArgumentException("Drug not found: " + drugInput));
     }
 
+    /**
+     * Finds genes by both drugs and returns the overlapping genes.
+     * 
+     * @return Set of gene names that are influenced by both drugs.
+     */
     public Set<String> geneOverlap() {
 
         String idDrug1 = getConceptID(firstDrugInput);
@@ -88,6 +117,11 @@ public class InteractionChecker {
     }
 
 
+    /**
+     * Returns the interaction types of the two drugs.
+     * 
+     * @return Array of Strings, first element is the type of the first drug, second element is the type of the second drug.
+     */
     public String[] getInteractionTypes() {
 
         String idDrug1 = getConceptID(firstDrugInput);
@@ -110,7 +144,12 @@ public class InteractionChecker {
         return new String[]{typeDrug1, typeDrug2};
     }
 
-
+    /**
+     * Determines the combination result based on overlapping genes and interaction types.
+     * 
+     * @param overlap Set of overlapping genes.
+     * @return The result of the combination ("enhancing", "opposing", etc.) or "unknown".
+     */
     public String getCombinationResult(Set<String> overlap) {
         outputSB.append("==== Combination drugs ==== \n");
         if (overlap.isEmpty()) {
@@ -142,8 +181,21 @@ public class InteractionChecker {
         return "Unknown";
     }
 
+    /**
+     * Represents a gene and its interaction score for the two drugs.
+     * 
+     * @param gene
+     * @param scoreDrug1
+     * @param scoreDrug2
+     */
     public record GeneScore(String gene, float scoreDrug1, float scoreDrug2) {}
 
+    /**
+     * Retrieves the interaction score per overlapping gene for the two drugs.
+     * 
+     * @param overlap Set of overlapping genes.
+     * @return List of GeneScore objects containing gene names and corresponding scores.
+     */
     public List<GeneScore> getInteractionScorePerGene(Set<String> overlap) {
 
         String idDrug1 = getConceptID(firstDrugInput);
@@ -189,7 +241,14 @@ public class InteractionChecker {
     }
 
 
-
+    /**
+     * Calculates combined interaction scores based on the combination result and gene scores.
+     * 
+     * @param combinationResult Result of drug combination.
+     * @param geneScores List of GeneScore objects for overlapping genes.
+     * @param overlap Set of overlapping genes.
+     * @return Status string ("done" or "unknown") after calculation.
+     */
     public String compareInteractionScore(String combinationResult,
                                                  List<GeneScore> geneScores,
                                                  Set<String> overlap) {
