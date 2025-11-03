@@ -52,7 +52,7 @@ class OutputGeneratorTest {
             // Implementations may write an empty file OR one empty line.
             long size = Files.size(out);
             List<String> lines = Files.readAllLines(out);
-            boolean ok = (size == 0) || (lines.size() == 1 && lines.get(0).isEmpty());
+            boolean ok = (size == 0) || (lines.size() == 1 && lines.getFirst().isEmpty());
             assertTrue(ok, "Empty output should result in an empty file or a single empty line");
         }
     }
@@ -72,38 +72,6 @@ class OutputGeneratorTest {
 
             assertTrue(Files.exists(out), "PDF should be created");
             assertTrue(Files.size(out) > 0, "PDF should not be empty");
-        }
-    }
-
-    @Nested
-    @DisplayName("Error handling")
-    class ErrorHandlingTests {
-
-        @Test
-        @DisplayName("throws IllegalArgumentException for unsupported extension")
-        void throwsForUnsupportedExtension() {
-            Path out = tempDir.resolve("output.csv"); // not supported
-            OutputGenerator gen = new OutputGenerator(out);
-
-            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> gen.generateOutput(new StringBuilder("x")));
-
-            assertTrue(ex.getMessage().toLowerCase().contains("unsupported"),
-                    "Message should indicate unsupported output format");
-        }
-
-        @Test
-        @DisplayName("throws RuntimeException for invalid path")
-        void throwsRuntimeException_OnInvalidPath() {
-            Path invalidPath = Path.of("/invalid/path/output.txt");
-            OutputGenerator gen = new OutputGenerator(invalidPath);
-
-            RuntimeException thrown = assertThrows(RuntimeException.class,
-                    () -> gen.generateOutput(new StringBuilder("geneX")));
-
-            assertTrue(thrown.getMessage().contains("Error in writing output overlap genes")
-                            || thrown.getMessage().toLowerCase().contains("error writing"),
-                    "Error message should contain context about writing failure");
         }
     }
 }

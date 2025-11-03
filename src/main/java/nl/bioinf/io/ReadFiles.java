@@ -20,13 +20,13 @@ import java.util.List;
  * <ul>
  *     <li>A TSV file containing drug–gene interactions</li>
  *     <li>A TSV file containing basic drug information</li>
- *     <li>A resource file on the classpath (<code>drug_combinations.tsv</code>) defining
+ *     <li>A classpath resource file (<code>drug_combinations.tsv</code>) defining
  *     possible outcomes for drug–type combinations</li>
  * </ul>
  *
- * <p>Each method validates the input file, trims headers, skips blank lines,
- * and performs basic structural validation to prevent malformed data from being used
- * downstream in the analysis pipeline.</p>
+ * <p>Each method validates the input file using {@link Validate#validateTsvFile(File, String)},
+ * trims headers, skips blank lines, and performs structural validation to prevent malformed
+ * data from being processed further in the analysis pipeline.</p>
  *
  * <p><strong>Usage example:</strong></p>
  * <pre>{@code
@@ -34,11 +34,10 @@ import java.util.List;
  * File drugs = new File("drugs.tsv");
  * ReadFiles reader = new ReadFiles(interactions, drugs);
  *
- * List<Interaction> interactionList = reader.processInteractions();
+ * List<Interaction> interactionsList = reader.processInteractions();
  * List<Drug> drugList = reader.processDrugs();
  * List<Combination> combinationList = reader.processCombinations();
  * }</pre>
- *
  */
 
 public class ReadFiles {
@@ -46,15 +45,22 @@ public class ReadFiles {
     private final File drugsFile;
     private static final String COMBINATIONS_RESOURCE = "drug_combinations.tsv";
 
+    /**
+     * Constructs a new {@code ReadFiles} instance with the given interaction and drug files.
+     *
+     * @param interactionsFile the TSV file containing drug–gene interactions
+     * @param drugsFile        the TSV file containing drug metadata
+     */
     public ReadFiles(File interactionsFile, File drugsFile) {
         this.interactionsFile = interactionsFile;
         this.drugsFile = drugsFile;
     }
+
     /**
-     * Reads, validates, and parses the interactions file.
+     * Reads, validates, and parses the  TSV file into {@link Interaction} objects.
      *
-     * @return a {@link List} of {@link Interaction} objects parsed from the file
-     * @throws IllegalArgumentException if the file is missing, empty, malformed, or has invalid headers
+     * @return a list of {@link Interaction} records parsed from the input file
+     * @throws IllegalArgumentException if the file is missing, invalid, or malformed
      */
     public List<Interaction> processInteractions() {
         return readInteractions(interactionsFile);
@@ -64,50 +70,52 @@ public class ReadFiles {
         return readDrugs(drugsFile);
     }
 
+    /**
+     * Loads and parses the built-in {@code drug_combinations.tsv} resource,
+     * containing pre-defined drug-type interaction results.
+     *
+     * @return a list of {@link Combination} records
+     * @throws IllegalArgumentException if the resource is missing or malformed
+     */
     public List<Combination> processCombinations() {
         return readCombinationsFromResource();
     }
+
     /**
-     * Validates that the provided file exists, is a non-empty TSV file,
-     * and is suitable for reading.
+     * Reads all non-empty lines from a UTF-8 encoded file, skipping blank lines.
+     * This method ensures consistent behavior for TSV parsing.
      *
-     * @param file  the file to validate
-     * @param label a descriptive label (used in error messages)
-     * @throws IllegalArgumentException if the file is null, does not exist, is not a regular file,
-     *                                  is empty, or does not have a .tsv extension
+     * @param file the file to read
+     * @return a list of non-blank lines
+     * @throws IOException if an I/O error occurs
      */
-
-    private void validateInputFile(File file, String label) {
-        if (file == null) {
-            throw new IllegalArgumentException(label + " is null.");
-        }
-        if (!file.exists()) {
-            throw new IllegalArgumentException(label + " not found: " + file.getAbsolutePath());
-        }
-        if (!file.isFile()) {
-            throw new IllegalArgumentException(label + " is not a file: " + file.getAbsolutePath());
-        }
-        if (file.length() == 0) {
-            throw new IllegalArgumentException(label + " is empty: " + file.getAbsolutePath());
-        }
-        if (!file.getName().toLowerCase().endsWith(".tsv")) {
-            throw new IllegalArgumentException(label + " must be a .tsv file: " + file.getAbsolutePath());
-        }
-    }
-
-    /** Trim alle header-velden zodat stray spaces geen issues geven. */
     private List<String> readLines(File file) throws IOException {
         return Files.readAllLines(file.toPath(), StandardCharsets.UTF_8)
                 .stream()
                 .filter(line -> !line.isBlank())
                 .toList();
     }
+    /**
+     * Splits and trims a TSV header line into individual normalized column names.
+     *
+     * @param headerLine the header line from the TSV file
+     * @return an array of trimmed header names
+     */
     private static String[] normalizeHeaders(String headerLine) {
         String[] headers = headerLine.split("\t", -1);
         for (int i = 0; i < headers.length; i++) headers[i] = headers[i].trim();
         return headers;
     }
 
+    /**
+     * Finds the index of a required header name in the given header array.
+     *
+     * @param headers the array of header names
+     * @param name    the header to locate
+     * @param file    the file being validated (for error context)
+     * @return the index position of the header
+     * @throws IllegalArgumentException if the header is missing
+     */
     private int indexOf(String[] headers, String name, File file) {
         for (int i = 0; i < headers.length; i++) {
             if (headers[i].equals(name)) return i;
@@ -130,7 +138,7 @@ public class ReadFiles {
      * @throws IllegalArgumentException if the file is invalid, malformed, or missing headers
      */
     private List<Interaction> readInteractions(File file) {
-        validateInputFile(file, "Interactions file");
+        Validate.validateTsvFile(file, "Interactions file");
         try {
             List<String> lines = readLines(file);
             if (lines.isEmpty()) return List.of();
@@ -185,7 +193,7 @@ public class ReadFiles {
      * @throws IllegalArgumentException if the file is invalid, malformed, or missing headers
      */
     private List<Drug> readDrugs(File file) {
-        validateInputFile(file, "Drugs file");
+        Validate.validateTsvFile(file, "Drugs file");
         try {
             List<String> lines = readLines(file);
             if (lines.isEmpty()) return List.of();
@@ -265,5 +273,5 @@ public class ReadFiles {
         }
         throw new IllegalArgumentException("Header not found: " + name);
     }
-    }
+}
 

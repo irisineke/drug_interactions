@@ -14,55 +14,6 @@ class ArgumentParserTest {
 
     @TempDir
     Path tempDir;
-
-    @Test
-    void fileNotEmptyCheck_throwsWhenFileDoesNotExist() {
-        ArgumentParser ap = new ArgumentParser();
-        Path missing = tempDir.resolve("missing.tsv");
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
-                () -> ap.fileNotEmptyCheck("Interactions file", missing.toString())
-        );
-        assertTrue(ex.getMessage().contains("does not exist"));
-    }
-
-    @Test
-    void fileNotEmptyCheck_throwsWhenPathIsDirectory() throws IOException {
-        ArgumentParser ap = new ArgumentParser();
-        Path dir = tempDir.resolve("aDir");
-        Files.createDirectory(dir);
-
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
-                () -> ap.fileNotEmptyCheck("Drugs file", dir.toString())
-        );
-        assertTrue(ex.getMessage().contains("is not a file"));
-    }
-
-    @Test
-    void fileNotEmptyCheck_throwsWhenFileIsEmpty() throws IOException {
-        ArgumentParser ap = new ArgumentParser();
-        Path empty = tempDir.resolve("empty.tsv");
-        Files.createFile(empty); // lege file
-
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
-                () -> ap.fileNotEmptyCheck("Interactions file", empty.toString())
-        );
-        assertTrue(ex.getMessage().contains("is empty"));
-    }
-
-    @Test
-    void fileNotEmptyCheck_okWhenFileHasContent() throws IOException {
-        ArgumentParser ap = new ArgumentParser();
-        Path ok = tempDir.resolve("ok.tsv");
-        Files.writeString(ok, "header1\theader2\nvalue\tvalue\n"); // heeft content
-
-        assertDoesNotThrow(() ->
-                ap.fileNotEmptyCheck("Drugs file", ok.toString())
-        );
-    }
-
     @Test
     void picocli_parsesOptionsIntoFields_withoutRunning() throws IOException {
         // Maak geldige fake files (inhoud maakt niet uit voor parsing)
