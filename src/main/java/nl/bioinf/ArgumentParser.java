@@ -3,13 +3,12 @@ package nl.bioinf;
 import nl.bioinf.io.*;
 import nl.bioinf.io.OutputGenerator;
 import nl.bioinf.logic.InteractionChecker;
-
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.IParameterConsumer;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.CommandSpec;
-
+import picocli.CommandLine;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -24,12 +23,6 @@ import nl.bioinf.models.Combination;
 /**
  * The {@code ArgumentParser} class defines and handles all command-line arguments
  * for the Drug Interactions program using the Picocli library.
- * <p>
- * This program reads two input files (drugs.tsv and interactions.tsv),
- * accepts two drug names from the user, and determines whether they can be
- * safely combined. The results are written to an output file.
- * <p>
- * Note: this program provides indicative analysis only — it does not offer medical advice.
  */
 @Command(
         name = "Drug Interactions",
@@ -40,8 +33,18 @@ import nl.bioinf.models.Combination;
 public class ArgumentParser implements Runnable {
 
     /**
-     * Consumer die na het eerste token alle opeenvolgende tokens (tot het volgende
-     * argument dat met '-') samenvoegt, zodat waarden met spaties ook zonder quotes werken.
+     * A custom {@link IParameterConsumer} implementation that allows command-line arguments
+     * consisting of multiple words (e.g., drug names with spaces) to be treated as a single parameter value.
+     * <p>
+     * Normally, Picocli splits arguments by whitespace, so an input like
+     * {@code --drug1 "Acetyl salicylic acid"} would need quotes. This consumer instead
+     * combines consecutive tokens into a single string until another option (starting with "-") is encountered.
+     * </p>
+     *
+     * <p><strong>Example:</strong><br>
+     * Input: {@code --drug1 Acetyl salicylic acid --drug2 Ibuprofen}<br>
+     * Result: {@code firstDrugInput = "Acetyl salicylic acid"} and {@code secondDrugInput = "Ibuprofen"}
+     * </p>
      */
     static class MultiWordParameterConsumer implements IParameterConsumer {
         @Override
@@ -53,7 +56,6 @@ public class ArgumentParser implements Runnable {
             StringBuilder sb = new StringBuilder();
             while (!args.isEmpty()) {
                 String next = args.peek();
-                // Stop bij volgende optie
                 if (next.startsWith("-")) break;
                 sb.append(args.pop());
                 if (!args.isEmpty() && !args.peek().startsWith("-")) {
@@ -64,37 +66,33 @@ public class ArgumentParser implements Runnable {
         }
     }
 
-    @Option(names = { "-intF", "--interactionsFile" },
-            paramLabel = "interactionsFile",
-            description = "the input file. for example: interactions.tsv",
-            required = true)
+    @Option(names = {"-intF", "--interactionsFile"}, required = true,
+            paramLabel = "FILE",
+            description = "Path to interaction TSV file (e.g., interaction.tsv).")
     File interactionsFile;
 
-    @Option(names = { "-drF", "--drugsFile" },
-            paramLabel = "drugsFile",
-            description = "the input file. for example: drugs.tsv",
-            required = true)
+    @Option(names = {"-drF", "--drugsFile"}, required = true,
+            paramLabel = "FILE",
+            description = "Path to drug TSV file (e.g., drug.tsv).")
     File drugsFile;
 
-    @Option(names = {"--drug1", "-d1"},
-            paramLabel = "firstDrugInput",
-            description = "put the first drug you want to compare here",
-            required = true,
-            parameterConsumer = MultiWordParameterConsumer.class)
+    @Option(names = {"--drug1", "-d1"}, required = true,
+            parameterConsumer = MultiWordParameterConsumer.class,
+            paramLabel = "\"NAME\"",
+            description = "First drug name (supports multi-word values).")
     String firstDrugInput;
 
-    @Option(names = {"--drug2", "-d2"},
-            paramLabel = "secondDrugInput",
-            description = "put the second drug you want to compare here",
-            required = true,
-            parameterConsumer = MultiWordParameterConsumer.class)
+    @Option(names = {"--drug2", "-d2"}, required = true,
+            parameterConsumer = MultiWordParameterConsumer.class,
+            paramLabel = "\"NAME\"",
+            description = "Second drug name (supports multi-word values).")
     String secondDrugInput;
 
-    @Option(names = {"--output", "-o"},
-            paramLabel = "output",
-            description = "put the path to where you want the output to land",
-            required = true)
+    @Option(names = {"--output", "-o"}, required = true,
+            paramLabel = "PATH",
+            description = "Output path for the generated report.")
     Path output;
+
 
     @Override
     public void run() {
@@ -106,7 +104,6 @@ public class ArgumentParser implements Runnable {
             List<Interaction> interactions = lb.processInteractions();
             List<Drug> drugs = lb.processDrugs();
             List<Combination> combinations = lb.processCombinations();
-
 
             InteractionChecker checker = new InteractionChecker(
                     interactions, drugs, combinations, firstDrugInput, secondDrugInput);
@@ -120,11 +117,16 @@ public class ArgumentParser implements Runnable {
             OutputGenerator generator = new OutputGenerator(output);
             generator.generateOutput(checker.getOutputSB());
 
-        } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
+            System.out.println("\u001B[32;1m✅ Analysis completed successfully!\u001B[0m");
+            System.out.println("Output saved to: " + output);
 
+        } catch (IllegalArgumentException e) {
+            throw new CommandLine.ExecutionException(new CommandLine(this), e.getMessage());
         } catch (Exception e) {
-            System.err.println("ERROR: " + e.getMessage());
+            throw new CommandLine.ExecutionException(new CommandLine(this), "Unexpected error: " + e.getMessage());
         }
+
+
     }
 }
+

@@ -148,7 +148,6 @@ public class InteractionChecker {
 
         String idDrug1 = getConceptID(firstDrugInput);
         String idDrug2 = getConceptID(secondDrugInput);
-        System.out.println(firstDrugInput);
 
         outputSB.append("==== Interaction scores per overlap genes ====\n");
 

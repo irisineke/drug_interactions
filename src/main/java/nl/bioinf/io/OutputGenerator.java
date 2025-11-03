@@ -32,7 +32,7 @@ public class OutputGenerator {
         } else if (fileName.endsWith(".pdf")) {
             generatePdf(stringBuilder);
         } else {
-            throw new IllegalArgumentException("Unsupported output format: " + fileName);
+            throw Validate.unsupportedOutputFormat(output);
         }
     }
 
@@ -46,7 +46,7 @@ public class OutputGenerator {
             Files.write(output, lines);
             System.out.println(" Text file successfully written to: " + output);
         } catch (IOException e) {
-            throw new RuntimeException("Error writing text output to: " + output, e);
+            throw Validate.ioWriteError(output,e);
         }
     }
 
@@ -56,9 +56,8 @@ public class OutputGenerator {
             PdfWriter.getInstance(document, new FileOutputStream(output.toFile()));
             document.open();
             document.add(new Paragraph(stringBuilder.toString()));
-            System.out.println(" PDF file successfully written to: " + output);
         } catch (IOException | DocumentException e) {
-            throw new RuntimeException("Error writing PDF output to: " + output, e);
+            throw Validate.ioReadError(output,e);
         } finally {
             document.close();
         }

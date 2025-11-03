@@ -20,19 +20,20 @@ src/main/java/nl/bioinf/
 │ └── Main # Entry point of the application
 ```
 
-Each class is responsible for a single, clear task:
-- **ReadFiles** loads and processes the `.tsv` data.
-- **InteractionChecker** performs the logic: overlaps, scores, and combination outcomes.
-- **OutputGenerator** handles report generation (supports `.txt` and `.pdf`).
-- **ArgumentParser** coordinates input and runs the analysis.
-- **Data model classes** (`Drug`, `Interaction`, `Combination`, `GeneScore`) represent structured, immutable domain data.
+Each class has a single, clear responsibility:
 
-
+- **ReadFiles** → Loads and parses `.tsv` input data.
+- **InteractionChecker** → Performs the analysis (overlap, interaction type, scores).
+- **OutputGenerator** → Writes formatted reports (`.txt` or `.pdf`).
+- **Validate** → Performs file and input validation.
+- **ArgumentParser** → Manages command-line input and orchestrates the workflow.
+- **Data model records** (`Drug`, `Interaction`, `Combination`, `GeneScore`) → Immutable representations of domain entities.
+---
 ## 🛠 Installation
 
 ### ✅ Requirements
 
-* **Java 24 or higher** (Java 24+ recommended)
+* **Java 21 or higher** (Java 24+ recommended)
 * Access to drug interaction data from **DGIdb** or **DrugBank**
 
 ### 1️⃣ Download Data
