@@ -1,7 +1,7 @@
 package nl.bioinf.io;
 
 
-// enum met: enhancing(+), opposing(-), unknown(+ en -), synergetisch(+, extra text)
+// enum: enhancing(+), opposing(-), unknown(+ and -), synergetisch(+, extra text)
 public enum CombinationScoreEffect {
     ENHANCING("+"),
     OPPOSING("-"),
