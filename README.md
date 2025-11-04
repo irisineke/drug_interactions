@@ -2,33 +2,10 @@
 
 This project uses two drug inputs and two data files (`interactions.tsv` and `drugs.tsv`) to perform an assessment. It evaluates whether two drugs can be safely combined based on known interactions. **Note:** This tool does not provide medical advice but offers indicative support to identify potential risks at an early stage.
 
-## 📁 Project Structure
+## ⚠️ Disclaimer
 
-```
-src/main/java/nl/bioinf/
-├── io/
-│ ├── CombinationScoreEffect # Enumeration for drug interaction effects
-│ ├── OutputGenerator # Handles writing output files (.txt / .pdf)
-│ ├── ReadFiles # Reads and processes input .tsv data files
-│ └── Validate # Validates file paths and input arguments
-│
-├── logic/
-│ └── InteractionChecker # Core logic: compares drugs, finds overlaps, calculates results
-│
-├── models/
-│ ├── ArgumentParser # Handles CLI input and program configuration
-│ └── Main # Entry point of the application
-```
+This tool **does not provide medical advice**. It is intended for research and educational purposes only.
 
-Each class has a single, clear responsibility:
-
-- **ReadFiles** → Loads and parses `.tsv` input data.
-- **InteractionChecker** → Performs the analysis (overlap, interaction type, scores).
-- **OutputGenerator** → Writes formatted reports (`.txt` or `.pdf`).
-- **Validate** → Performs file and input validation.
-- **ArgumentParser** → Manages command-line input and orchestrates the workflow.
-- **Data model records** (`Drug`, `Interaction`, `Combination`, `GeneScore`) → Immutable representations of domain entities.
----
 ## 🛠 Installation
 
 ### ✅ Requirements
@@ -73,11 +50,39 @@ java -jar build/libs/drug_interactions-1.0-SNAPSHOT-all.jar \
 
 ### ⚠️ Warning
 
-If you are using a drug with a special charicter please use "" around the drugs
+“If a drug name contains special characters, please enclose it in quotes.”
 
-For example: 
+For example:
 
 "BRAF(V600E) Kinase Inhibitor RO5212054"
+
+## 📁 Project Structure
+
+```
+src/main/java/nl/bioinf/
+├── io/
+│ ├── CombinationScoreEffect # Enumeration for drug interaction effects
+│ ├── OutputGenerator # Handles writing output files (.txt / .pdf)
+│ ├── ReadFiles # Reads and processes input .tsv data files
+│ └── ValidationUtils # Validates file paths and input arguments
+│
+├── logic/
+│ └── InteractionChecker # Core logic: compares drugs, finds overlaps, calculates results
+│
+├── models/
+│ ├── ArgumentParser # Handles CLI input and program configuration
+│ └── Main # Entry point of the application
+```
+
+Each class has a single, clear responsibility:
+
+- **ReadFiles** → Loads and parses `.tsv` input data.
+- **InteractionChecker** → Performs the analysis (overlap, interaction type, scores).
+- **OutputGenerator** → Writes formatted reports (`.txt` or `.pdf`).
+- **ValidationUtils** → Performs file and input validation.
+- **ArgumentParser** → Manages command-line input and orchestrates the workflow.
+- **Data model records** (`Drug`, `Interaction`, `Combination`, `GeneScore`) → Immutable representations of domain entities.
+---
 
 ## 🧪 Testing (JUnit 5)
 
@@ -93,10 +98,25 @@ Run tests with:
 ```bash
 ./gradlew test
 ```
+## 🧩 Developer Guide
+![img.png](img/img.png)
 
-## ⚠️ Disclaimer
+The UML diagram above illustrates how data flows through the program:
+- ArgumentParser reads CLI parameters and validates inputs.
+- ReadFiles loads drugs.tsv and interactions.tsv into domain objects.
+- InteractionChecker performs the main analysis — finding overlaps and calculating combination scores.
+- OutputGenerator writes the results to .txt or .pdf (depending on output extension).
+- ValidationUtils ensures all file paths and arguments are correct before execution.
 
-This tool **does not provide medical advice**. It is intended for research and educational purposes only.
+### How to Add New Output Formats
+If you would like support for other output formats (e.g., CSV, XML, or Excel), please contact us or open an issue in the repository.
+We will evaluate the request and consider adding it if there is community interest.
+
+### ⚙️ Performance Tips for Large Datasets
+- Use a BufferedReader with a Stream<String> to process files line by line (lazy processing),
+keeping only one line in memory at a time.
+- Split lines directly on the tab character ('\t') instead of using String.split() with regex — this is significantly 
+faster and lighter.
 
 ## 📄 License
 

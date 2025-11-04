@@ -22,7 +22,7 @@ import java.io.IOException;
  * Validate.validateTsvFile(new File("interactions.tsv"), "Interactions file");
  * }</pre>
  */
-public class Validate {
+public class ValidationUtils {
 
     /**
      * Validates that the provided output path points to a writable directory and a

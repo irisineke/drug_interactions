@@ -16,7 +16,7 @@ import java.util.Locale;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Validate")
-class ValidateTest {
+class ValidationUtilsTest {
 
     @TempDir
     Path tmp;
@@ -31,15 +31,15 @@ class ValidateTest {
         @DisplayName("accepts .txt and .pdf in existing, writable directory")
         void acceptsTxtAndPdf() throws IOException {
             Path dir = Files.createDirectory(tmp.resolve("out"));
-            Validate.validateOutputPath(dir.resolve("report.txt"));
-            Validate.validateOutputPath(dir.resolve("report.pdf"));
+            ValidationUtils.validateOutputPath(dir.resolve("report.txt"));
+            ValidationUtils.validateOutputPath(dir.resolve("report.pdf"));
         }
 
         @Test
         @DisplayName("rejects null")
         void rejectsNull() {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateOutputPath(null));
+                    () -> ValidationUtils.validateOutputPath(null));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("output path is null"));
         }
 
@@ -49,7 +49,7 @@ class ValidateTest {
             Path dir = Files.createDirectory(tmp.resolve("out"));
             Path out = dir.resolve("report.csv");
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateOutputPath(out));
+                    () -> ValidationUtils.validateOutputPath(out));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("must end with '.txt' or '.pdf'"));
         }
 
@@ -59,7 +59,7 @@ class ValidateTest {
             Path dir = Files.createDirectory(tmp.resolve("out"));
             Path out = dir.resolve(".txt");
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateOutputPath(out));
+                    () -> ValidationUtils.validateOutputPath(out));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("must include a name before the extension"));
         }
 
@@ -68,7 +68,7 @@ class ValidateTest {
         void rejectsNonExistentDirectory() {
             Path out = tmp.resolve("no_such_dir").resolve("report.txt");
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateOutputPath(out));
+                    () -> ValidationUtils.validateOutputPath(out));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("directory does not exist"));
         }
 
@@ -79,7 +79,7 @@ class ValidateTest {
             Files.write(fileAsParent, List.of("x"));
             Path out = fileAsParent.resolve("report.txt"); // resolving against a file is okay syntactisch
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateOutputPath(out));
+                    () -> ValidationUtils.validateOutputPath(out));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("parent is not a directory"));
         }
 
@@ -96,7 +96,7 @@ class ValidateTest {
 
             Path out = dir.resolve("report.txt");
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateOutputPath(out));
+                    () -> ValidationUtils.validateOutputPath(out));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("not writable"));
         }
     }
@@ -109,21 +109,21 @@ class ValidateTest {
         @Test
         @DisplayName("accepts different names (case-insensitive)")
         void acceptsDifferent() {
-            Validate.validateDifferentDrugs("Aspirin", "Ibuprofen");
+            ValidationUtils.validateDifferentDrugs("Aspirin", "Ibuprofen");
         }
 
         @Test
         @DisplayName("rejects null values")
         void rejectsNulls() {
-            assertThrows(IllegalArgumentException.class, () -> Validate.validateDifferentDrugs(null, "X"));
-            assertThrows(IllegalArgumentException.class, () -> Validate.validateDifferentDrugs("X", null));
+            assertThrows(IllegalArgumentException.class, () -> ValidationUtils.validateDifferentDrugs(null, "X"));
+            assertThrows(IllegalArgumentException.class, () -> ValidationUtils.validateDifferentDrugs("X", null));
         }
 
         @Test
         @DisplayName("rejects same names ignoring case")
         void rejectsSameIgnoringCase() {
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateDifferentDrugs("Clonidine", "clonidine"));
+                    () -> ValidationUtils.validateDifferentDrugs("Clonidine", "clonidine"));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("same drug"));
         }
     }
@@ -139,15 +139,15 @@ class ValidateTest {
         void acceptsValidTsv() throws IOException {
             Path tsv = tmp.resolve("ok.tsv");
             Files.write(tsv, List.of("header1\theader2", "a\tb"));
-            Validate.validateTsvPath(tsv, "Drugs TSV");
-            Validate.validateTsvFile(tsv.toFile(), "Drugs TSV");
+            ValidationUtils.validateTsvPath(tsv, "Drugs TSV");
+            ValidationUtils.validateTsvFile(tsv.toFile(), "Drugs TSV");
         }
 
         @Test
         @DisplayName("rejects null")
         void rejectsNull() {
-            assertThrows(IllegalArgumentException.class, () -> Validate.validateTsvPath(null, "X"));
-            assertThrows(IllegalArgumentException.class, () -> Validate.validateTsvFile( null, "X"));
+            assertThrows(IllegalArgumentException.class, () -> ValidationUtils.validateTsvPath(null, "X"));
+            assertThrows(IllegalArgumentException.class, () -> ValidationUtils.validateTsvFile( null, "X"));
         }
 
         @Test
@@ -155,7 +155,7 @@ class ValidateTest {
         void rejectsMissingFile() {
             Path missing = tmp.resolve("missing.tsv");
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateTsvPath(missing, "Interactions TSV"));
+                    () -> ValidationUtils.validateTsvPath(missing, "Interactions TSV"));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("not found"));
         }
 
@@ -164,7 +164,7 @@ class ValidateTest {
         void rejectsDirectory() throws IOException {
             Path dir = Files.createDirectory(tmp.resolve("dir_as_file"));
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateTsvPath(dir, "Interactions TSV"));
+                    () -> ValidationUtils.validateTsvPath(dir, "Interactions TSV"));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("is not a file"));
         }
 
@@ -173,7 +173,7 @@ class ValidateTest {
         void rejectsEmptyFile() throws IOException {
             Path empty = Files.createFile(tmp.resolve("empty.tsv"));
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateTsvPath(empty, "Interactions TSV"));
+                    () -> ValidationUtils.validateTsvPath(empty, "Interactions TSV"));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("is empty"));
         }
 
@@ -183,7 +183,7 @@ class ValidateTest {
             Path csv = tmp.resolve("data.csv");
             Files.write(csv, List.of("a,b"));
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateTsvPath(csv, "Interactions TSV"));
+                    () -> ValidationUtils.validateTsvPath(csv, "Interactions TSV"));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("must be a .tsv file"));
         }
 
@@ -196,7 +196,7 @@ class ValidateTest {
             Files.setPosixFilePermissions(f, EnumSet.noneOf(PosixFilePermission.class));
 
             IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> Validate.validateTsvPath(f, "Drugs TSV"));
+                    () -> ValidationUtils.validateTsvPath(f, "Drugs TSV"));
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("not readable"));
         }
     }
@@ -210,7 +210,7 @@ class ValidateTest {
         @DisplayName("unsupportedOutputFormat builds informative message")
         void unsupportedOutputFormat_hasMessage() {
             Path p = Paths.get("/tmp/out.xyz");
-            IllegalArgumentException ex = Validate.unsupportedOutputFormat(p);
+            IllegalArgumentException ex = ValidationUtils.unsupportedOutputFormat(p);
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("must end with '.txt' or '.pdf'"));
         }
 
@@ -219,7 +219,7 @@ class ValidateTest {
         void ioWriteError_hasPathAndCause() {
             Path p = Paths.get("/tmp/out.txt");
             IOException cause = new IOException("disk full");
-            IllegalArgumentException ex = Validate.ioWriteError(p, cause);
+            IllegalArgumentException ex = ValidationUtils.ioWriteError(p, cause);
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("failed to write"));
             assertSame(cause, ex.getCause());
         }
@@ -229,7 +229,7 @@ class ValidateTest {
         void ioReadError_hasPathAndCause() {
             Path p = Paths.get("/tmp/in.tsv");
             IOException cause = new IOException("permission denied");
-            IllegalArgumentException ex = Validate.ioReadError(p, cause);
+            IllegalArgumentException ex = ValidationUtils.ioReadError(p, cause);
             assertTrue(ex.getMessage().toLowerCase(Locale.ROOT).contains("failed to read"));
             assertSame(cause, ex.getCause());
         }
