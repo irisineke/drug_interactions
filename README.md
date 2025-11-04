@@ -117,6 +117,7 @@ We will evaluate the request and consider adding it if there is community intere
 keeping only one line in memory at a time.
 - Split lines directly on the tab character ('\t') instead of using String.split() with regex — this is significantly 
 faster and lighter.
+- Consider using inheritance if you plan to add many new file types or complex analyses, but be aware that this can make the code less readable.
 
 ## 📄 License
 
