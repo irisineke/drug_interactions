@@ -97,8 +97,8 @@ public class ArgumentParser implements Runnable {
     @Override
     public void run() {
         try {
-            Validate.validateDifferentDrugs(firstDrugInput, secondDrugInput);
-            Validate.validateOutputPath(output);
+            ValidationUtils.validateDifferentDrugs(firstDrugInput, secondDrugInput);
+            ValidationUtils.validateOutputPath(output);
 
             ReadFiles lb = new ReadFiles(interactionsFile, drugsFile);
             List<Interaction> interactions = lb.processInteractions();

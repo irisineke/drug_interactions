@@ -24,7 +24,7 @@ import java.util.List;
  *     possible outcomes for drug–type combinations</li>
  * </ul>
  *
- * <p>Each method validates the input file using {@link Validate#validateTsvFile(File, String)},
+ * <p>Each method validates the input file using {@link ValidationUtils#validateTsvFile(File, String)},
  * trims headers, skips blank lines, and performs structural validation to prevent malformed
  * data from being processed further in the analysis pipeline.</p>
  *
@@ -138,7 +138,7 @@ public class ReadFiles {
      * @throws IllegalArgumentException if the file is invalid, malformed, or missing headers
      */
     private List<Interaction> readInteractions(File file) {
-        Validate.validateTsvFile(file, "Interactions file");
+        ValidationUtils.validateTsvFile(file, "Interactions file");
         try {
             List<String> lines = readLines(file);
             if (lines.isEmpty()) return List.of();
@@ -193,7 +193,7 @@ public class ReadFiles {
      * @throws IllegalArgumentException if the file is invalid, malformed, or missing headers
      */
     private List<Drug> readDrugs(File file) {
-        Validate.validateTsvFile(file, "Drugs file");
+        ValidationUtils.validateTsvFile(file, "Drugs file");
         try {
             List<String> lines = readLines(file);
             if (lines.isEmpty()) return List.of();
