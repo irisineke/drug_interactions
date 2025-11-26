@@ -5,6 +5,8 @@ import nl.bioinf.models.Drug;
 import nl.bioinf.models.Interaction;
 import nl.bioinf.io.CombinationScoreEffect;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -85,20 +87,27 @@ public class InteractionChecker {
 
 
 // get genes that influence the drugs:
-        Set<String> genesDrug1 = interactions.stream()
-                .filter(interaction -> interaction.drugConceptId().equals(idDrug1))
-                .map(Interaction::geneClaimName)
-                .collect(Collectors.toSet());
+        Set<String> genesDrug1 = new HashSet<>();
+        for (Interaction interaction : interactions) {
+            if (interaction.drugConceptId().equalsIgnoreCase(idDrug1)) {
+                genesDrug1.add(interaction.geneClaimName());
+            }
+        }
 
-        Set<String> genesDrug2 = interactions.stream()
-                .filter(interaction -> interaction.drugConceptId().equals(idDrug2))
-                .map(Interaction::geneClaimName)
-                .collect(Collectors.toSet());
+        Set<String> genesDrug2 = new HashSet<>();
+        for (Interaction interaction : interactions) {
+            if (interaction.drugConceptId().equalsIgnoreCase(idDrug2)) {
+                genesDrug2.add(interaction.geneClaimName());
+            }
+        }
 
 // find overlap between drugs:
-        Set<String> overlap = genesDrug1.stream()
-                .filter(genesDrug2::contains)
-                .collect(Collectors.toSet());
+        Set<String> overlap = new HashSet<>();
+        for (String gene : genesDrug1) {
+            if (genesDrug2.contains(gene)) {
+                overlap.add(gene);
+            }
+        }
 
         outputSB.append("Number of genes influenced by ").append(firstDrugInput).append(": ").append(genesDrug1.size()).append("\n");
         outputSB.append("Number of genes influenced by ").append(secondDrugInput).append(": ").append(genesDrug2.size()).append("\n\n");
@@ -260,65 +269,84 @@ public class InteractionChecker {
         CombinationScoreEffect effectSymbol = CombinationScoreEffect.fromResult(combinationResult);
 
 
-        List<String> combinedResults = geneScores.stream()
-                .map(genescore -> {
-                    float combinedScore;
-                    switch (effectSymbol) {
-                        case ENHANCING -> {
-                            combinedScore = genescore.scoreDrug1() + genescore.scoreDrug2();
-                            return genescore.gene() + ": " + genescore.scoreDrug1() + " + " + genescore.scoreDrug2() + " = " + combinedScore;
-                        }
-                        case OPPOSING -> {
-                            combinedScore = genescore.scoreDrug1() - genescore.scoreDrug2();
-                            return genescore.gene() + ": " + genescore.scoreDrug1() + " - " + genescore.scoreDrug2() + " = " + combinedScore;
-                        }
-                        case SYNERGETISCH -> {
-                            combinedScore = genescore.scoreDrug1() + genescore.scoreDrug2();
-                            return genescore.gene() + ": " + genescore.scoreDrug1() + " + " + genescore.scoreDrug2() + "(synergetic) = " + combinedScore;
-                        }
-                        case UNKNOWN -> {
-                            float plus = genescore.scoreDrug1() + genescore.scoreDrug2();
-                            float minus = genescore.scoreDrug1() - genescore.scoreDrug2();
-                            return genescore.gene() + ": " + genescore.scoreDrug1() + " + " + genescore.scoreDrug2() + " = " + plus + "\n\t " +
-                                    genescore.scoreDrug1() + " - " + genescore.scoreDrug2() + " = " + minus;
-                        }
-                    }
-                    return "something went wrong";
-                })
-                .toList();
+        List<String> combinedResults = new ArrayList<>();
 
-        List<String> explanationLines = geneScores.stream()
-                .map(genescore -> {
-                    float combinedScore;
-                    switch (effectSymbol) {
-                        case ENHANCING -> {
-                            float combined = genescore.scoreDrug1() + genescore.scoreDrug2();
-                            return "The activity of " + genescore.gene() + " is increased by " + combined + ".";
-                        }
-                        case OPPOSING -> {
-                            float combined = genescore.scoreDrug1() - genescore.scoreDrug2();
-                            return "The activity of " + genescore.gene() + " is decreased by " + combined + ".";
-                        }
-                        case SYNERGETISCH -> {
-                            float combined = genescore.scoreDrug1() + genescore.scoreDrug2();
-                            return "The activity of " + genescore.gene() + " is increased by more than" + combined + ".";
-                        }
-                        case UNKNOWN -> {
-                            float plus = genescore.scoreDrug1() + genescore.scoreDrug2();
-                            float minus = genescore.scoreDrug1() - genescore.scoreDrug2();
-                            return "The activity of " + genescore.gene() + " is increased by " + plus + " or decreased by " + minus + ".";
+        for (GeneScore genescore : geneScores) {
+            float score1 = genescore.scoreDrug1();
+            float score2 = genescore.scoreDrug2();
+            float combinedScore;
 
-                        }
-                    }
-                    return "something went wrong";
-                })
-                .toList();
+            switch (effectSymbol) {
+                case ENHANCING: {
+                    combinedScore = score1 + score2;
+                    combinedResults.add(genescore.gene() + ": " + score1 + " + " + score2 + " = " + combinedScore);
+                    break;
+                }
+                case OPPOSING: {
+                    combinedScore = score1 - score2;
+                    combinedResults.add(genescore.gene() + ": " + score1 + " - " + score2 + " = " + combinedScore);
+                    break;
+                }
+                case SYNERGETISCH: {
+                    combinedScore = score1 + score2;
+                    combinedResults.add(genescore.gene() + ": " + score1 + " + " + score2 + "(synergetic) = " + combinedScore);
+                    break;
+                }
+                case UNKNOWN: {
+                    float plus = score1 + score2;
+                    float minus = score1 - score2;
+                    combinedResults.add(genescore.gene() + ": " + score1 + " + " + score2 + " = " + plus + "\n\t " +
+                            score1 + " - " + score2 + " = " + minus);
+                        break;
+                }
+            }
+        }
 
 
-        combinedResults.forEach(line -> outputSB.append(line).append("\n"));
+        List<String> explanationLines = new ArrayList<>();
+
+        for (GeneScore genescore : geneScores) {
+            float score1 = genescore.scoreDrug1();
+            float score2 = genescore.scoreDrug2();
+            float combinedScore;
+
+            switch (effectSymbol) {
+                case ENHANCING: {
+                    combinedScore = score1 + score2;
+                    explanationLines.add("The activity of " + genescore.gene() + " is increased by " + combinedScore + ".");
+                    break;
+                }
+                case OPPOSING: {
+                    combinedScore = score1 + score2;
+                    explanationLines.add("The activity of " + genescore.gene() + " is decreased by " + combinedScore + ".");
+                    break;
+                }
+                case SYNERGETISCH: {
+                    combinedScore = score1 + score2;
+                    explanationLines.add("The activity of " + genescore.gene() + " is increased by more than" + combinedScore + ".");
+                    break;
+                }
+                case UNKNOWN: {
+                    float plus = score1 + score2;
+                    float minus = score1 - score2;
+                    explanationLines.add("The activity of " + genescore.gene() + " is increased by " + plus + " or decreased by " + minus + ".");
+                    break;
+                }
+            }
+        }
+
+
+        // output:
+        for (String line : combinedResults) {
+            outputSB.append(line).append("\n");
+        }
+
         outputSB.append("\n");
         outputSB.append("==== Calculation Results ==== \n");
-        explanationLines.forEach(line -> outputSB.append(line).append("\n"));
+
+        for (String line : explanationLines) {
+            outputSB.append(line).append("\n");
+        }
         return "done";
     }
 }
