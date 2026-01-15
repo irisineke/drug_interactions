@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * InteractionChecker is responsible for analyzing interactions between two drugs,
@@ -136,22 +138,21 @@ public class InteractionChecker {
         String idDrug1 = getConceptID(firstDrugInput);
         String idDrug2 = getConceptID(secondDrugInput);
 
+        String typeDrug1 = "Unknown";
+        String typeDrug2 = "Unknown";
 
-        String typeDrug1 = interactions.stream()
-                .filter(interaction -> interaction.drugConceptId().equals(idDrug1))
-                .map(Interaction::interactionType)
-                .findFirst()
-                .orElse("Unknown");
+        for (Interaction interaction : interactions) {
+            if (interaction.drugConceptId().equals(idDrug1)) {
+                typeDrug1 = interaction.interactionType();
+            }
 
-        String typeDrug2 = interactions.stream()
-                .filter(interaction -> interaction.drugConceptId().equals(idDrug2))
-                .map(Interaction::interactionType)
-                .findFirst()
-                .orElse("Unknown");
-
-
+            if (interaction.drugConceptId().equals(idDrug2)) {
+                typeDrug2 = interaction.interactionType();
+            }
+        }
         return new String[]{typeDrug1, typeDrug2};
-    }
+}
+
 
     /**
      * Determines the combination result based on overlapping genes and interaction types.
@@ -212,42 +213,64 @@ public class InteractionChecker {
 
         outputSB.append("==== Interaction scores per overlap genes ====\n");
 
-        // retrieve scores for the first drug and creates a map<gene,score>
-        var scoreDrug1 = interactions.stream()
-                .filter(interaction -> interaction.drugConceptId().equals(idDrug1))
-                .collect(Collectors.toMap(
-                        Interaction::geneClaimName,
-                        interaction -> Float.parseFloat(interaction.interactionScore()),
-                        (a, b) -> a)); // if gene occurs more often it keeps first score
+
+        Map<String, Float> scoreDrug1 = new HashMap<>();
+        Map<String, Float> scoreDrug2 = new HashMap<>();
 
 
-        var scoreDrug2 = interactions.stream()
-                .filter(interaction -> interaction.drugConceptId().equals(idDrug2))
-                .collect(Collectors.toMap(
-                        Interaction::geneClaimName,
-                        interaction -> Float.parseFloat(interaction.interactionScore()),
-                        (a, b) -> a));
+        for (Interaction interaction : interactions) {
+
+            String drugId = interaction.drugConceptId();
+            String gene = interaction.geneClaimName();
+
+            float score;
+            try {
+                score = Float.parseFloat(interaction.interactionScore());
+            } catch (NumberFormatException e) {
+
+                continue;
+            }
 
 
-        List<GeneScore> geneScores = overlap.stream()
-                .filter(gene -> scoreDrug1.containsKey(gene) && scoreDrug2.containsKey(gene))
-                // for each gene it takes scores from drug 1/2 and creates a map
-                .map(gene -> new GeneScore(gene, scoreDrug1.get(gene), scoreDrug2.get(gene)))
-                .toList();
+            if (drugId.equals(idDrug1)) {
+                if (!scoreDrug1.containsKey(gene)) {
+                    scoreDrug1.put(gene, score);
+                }
+            }
+
+            if (drugId.equals(idDrug2)) {
+                if (!scoreDrug2.containsKey(gene)) {
+                    scoreDrug2.put(gene, score);
+                }
+            }
+        }
+
+
+        List<GeneScore> geneScores = new ArrayList<>();
+
+        for (String gene : overlap) {
+            if (scoreDrug1.containsKey(gene) && scoreDrug2.containsKey(gene)) {
+                geneScores.add(new GeneScore(gene, scoreDrug1.get(gene), scoreDrug2.get(gene)));
+            }
+        }
 
 
         if (geneScores.isEmpty()) {
             outputSB.append("No overlapping genes with scores found.\n\n");
         } else {
             outputSB.append("gene: first drug = first drug score, second drug = second drug score\n\n");
-            geneScores.forEach(geneScore -> outputSB.append(geneScore.gene())
-                    .append("; ").append(firstDrugInput).append(" = ").append(geneScore.scoreDrug1())
-                    .append("; ").append(secondDrugInput).append(" = ").append(geneScore.scoreDrug2())
-                    .append("\n"));
+            for (GeneScore geneScore : geneScores) {
+                outputSB.append(geneScore.gene())
+                        .append("; ").append(firstDrugInput).append(" = ").append(geneScore.scoreDrug1())
+                        .append("; ").append(secondDrugInput).append(" = ").append(geneScore.scoreDrug2())
+                        .append("\n");
+            }
         }
-    outputSB.append("\n");
+
+        outputSB.append("\n");
         return geneScores;
-    }
+}
+
 
 
     /**
